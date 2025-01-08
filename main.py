@@ -1,7 +1,7 @@
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from sockets import sio_app
+from app.sockets.sockets import sio_app
 
 app = FastAPI()
 app.mount('/sockets', app=sio_app)
