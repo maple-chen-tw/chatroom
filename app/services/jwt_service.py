@@ -8,14 +8,11 @@ from jwt.exceptions import InvalidTokenError
 from passlib.context import CryptContext
 
 from app.models.dto import User, UserInDB, Token, TokenData
-from app.db import fake_users_db
+from app.fake_db import fake_users_db
+from constants import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
-
-SECRET_KEY = "25714cad9147ba393fa5e67268dc596980fddb84a572fe72bc566a35459f12b0"
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 
 def verify_password(plain_password, hashed_password):

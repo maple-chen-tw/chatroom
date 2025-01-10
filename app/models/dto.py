@@ -1,6 +1,7 @@
 # app/models/user.py
 from pydantic import BaseModel, EmailStr
 from datetime import datetime
+from pydantic import Field
 
 class Token(BaseModel):
     access_token: str
@@ -15,7 +16,6 @@ class User(BaseModel):
     user_id: int 
     username: str
     email: str | None = None
-    disabled: bool | None = None
     nickname: str | None = None 
     avatar_url: str | None = None 
     status: str | None = None
@@ -25,3 +25,18 @@ class User(BaseModel):
 
 class UserInDB(User):
     hashed_password: str
+
+class GetUser(BaseModel):
+    user_id: int 
+    username: str
+    email: str | None = None
+    nickname: str | None = None 
+    avatar_url: str | None = None 
+    status: str | None = None
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+
+class CreateUser(BaseModel):
+    username: str
+    password: str = Field(..., min_length=4)
+  

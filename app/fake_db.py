@@ -11,6 +11,5 @@ fake_users_db = {
         "status": "Living the dream",
         "created_at": datetime(2020, 1, 1, 12, 0, 0), 
         "updated_at": datetime(2023, 1, 1, 12, 0, 0),
-        "disabled": False,
     }
 }
