@@ -2,12 +2,10 @@
 from fastapi import HTTPException, status, APIRouter
 from app.models import db
 from app.models import dto
-from passlib.context import CryptContext
-from app.fake_db import fake_users_db
 from app.services.jwt_service import *
 from app.services import user_service
 from constants import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
-
+from utils import dependencies
 
 router = APIRouter(
     prefix="/auth",
@@ -61,12 +59,12 @@ async def login_for_access_token(
     
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
+        data={"sub": user.username, "user_id": user.user_id}, expires_delta=access_token_expires
     )
     return Token(access_token=access_token, token_type="bearer")
 
 @router.post("/logout", status_code=status.HTTP_200_OK)
-async def logout(token: str = Depends(oauth2_scheme)):
+async def logout(user: dependencies.user_dependency):
     # add logic to check if token valid
     # let client delete token from local 
     return {"msg": "Successfully logged out"}
@@ -74,13 +72,13 @@ async def logout(token: str = Depends(oauth2_scheme)):
 
 @router.get("/users/me/", response_model=dto.GetUser)
 async def read_users_me(
-    current_user: Annotated[dto.GetUser, Depends(get_current_user)],
+    user: dependencies.user_dependency,
 ):
-    return current_user
+    return user
 
 
 @router.get("/users/me/items/")
 async def read_own_items(
-    current_user: Annotated[dto.GetUser, Depends(get_current_user)],
+    user: dependencies.user_dependency,
 ):
-    return [{"item_id": "Foo", "owner": current_user.username}]
+    return [{"item_id": "Foo", "owner": user.username}]
