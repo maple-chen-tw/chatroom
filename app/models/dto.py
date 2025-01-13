@@ -19,8 +19,8 @@ class User(BaseModel):
     nickname: str | None = None 
     avatar_url: str | None = None 
     status: str | None = None
-    created_at: datetime | None = None
-    updated_at: datetime | None = None 
+    created_at: datetime
+    updated_at: datetime 
 
 
 class UserInDB(User):
@@ -33,10 +33,13 @@ class GetUser(BaseModel):
     nickname: str | None = None 
     avatar_url: str | None = None 
     status: str | None = None
-    created_at: datetime | None = None
-    updated_at: datetime | None = None
+    created_at: datetime
+    updated_at: datetime
 
 class CreateUser(BaseModel):
     username: str
     password: str = Field(..., min_length=4)
-  
+
+class LoginUser(BaseModel):
+    username: str
+    password: str

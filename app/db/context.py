@@ -5,7 +5,7 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import sessionmaker
 
-from models.db import Base
+from app.models.db import Base
 from constants import DB_CONNECTION_STRING
 
 
