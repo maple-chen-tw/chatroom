@@ -1,9 +1,6 @@
-
-from sqlalchemy import Column
-from sqlalchemy import Integer
-from sqlalchemy import String
-from sqlalchemy import DateTime
 from sqlalchemy.sql import func
+from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy.orm import relationship
 
 from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
@@ -18,3 +15,14 @@ class User(Base):
     status = Column("status", String(256))
     created_at = Column("created_at", DateTime(), default=func.current_timestamp())
     updated_at = Column("updated_at", DateTime(), default=func.current_timestamp(), onupdate=func.current_timestamp())
+
+class Friend(Base):
+    __tablename__ = 'friends'
+
+    user_id = Column(Integer, ForeignKey('users.user_id', ondelete='CASCADE'), primary_key=True)  
+    friend_id = Column(Integer, ForeignKey('users.user_id', ondelete='CASCADE'), primary_key=True)
+    status = Column(String(50), nullable=False)  # friends relationship status: pending, accepted, rejected, deleted
+    created_at = Column(DateTime, default=func.current_timestamp())
+
+    user = relationship("User", foreign_keys=[user_id])
+    friend = relationship("User", foreign_keys=[friend_id])

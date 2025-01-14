@@ -1,6 +1,5 @@
 from sqlalchemy import Delete
 from sqlalchemy import Update
-from sqlalchemy.sql.functions import current_timestamp
 from sqlalchemy import func
 from app.models.db import User
 from app.db.context import session_maker
@@ -53,3 +52,7 @@ def update(user_id: int, email: str, nickname: str, avatar_url: str, status:str)
 
 
     return get_by_user_id(user_id)  
+
+def delete(user_id: int) -> None:
+    with session_maker.begin() as session:
+        session.execute(Delete(User).where(User.user_id == user_id))

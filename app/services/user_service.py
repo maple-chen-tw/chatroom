@@ -25,3 +25,6 @@ def update(user_id: int, user_data: dto.UpdateUser) -> db.User:
         user_data.avatar_url, 
         user_data.status
     )
+
+def delete(user_id: int) -> None:
+    user_repo.delete(user_id)

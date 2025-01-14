@@ -38,5 +38,5 @@ def delete_user(user_id: int, user: dependencies.user_dependency):
     if user.user_id != user_id:
         raise HTTPException(status_code=403, detail="Forbidden")
     
-    user_service.delete_user(user_id)
+    user_service.delete(user_id)
     return None
