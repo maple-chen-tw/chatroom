@@ -4,7 +4,7 @@ from typing import Annotated
 import jwt
 from fastapi import Depends, FastAPI, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from jwt.exceptions import InvalidTokenError
+
 from passlib.context import CryptContext
 from app.services import user_service
 from app.models.dto import User, UserInDB, Token, TokenData
@@ -36,6 +36,8 @@ def authenticate_user(fake_db, username: str, password: str):
     if not verify_password(password, user.hashed_password):
         return False
     return user
+
+
 
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):

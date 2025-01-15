@@ -9,6 +9,7 @@ from typing import Annotated
 from constants import SECRET_KEY, ALGORITHM
 from app.models.dto import TokenData
 
+
 def get_user(token: Annotated[str, Depends(oauth2_scheme)])->db.User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
