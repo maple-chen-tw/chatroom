@@ -52,7 +52,7 @@ class LoginUser(BaseModel):
     password: str
 
 class Friend(BaseModel):
-    friend_id: int
+    user_id: int
     username: str
     nickname: str | None = None
     avatar_url: str | None = None
