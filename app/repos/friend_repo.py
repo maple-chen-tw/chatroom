@@ -1,4 +1,5 @@
 from app.models.db import Friend, User
+from sqlalchemy import Delete
 from app.db.context import session_maker
 def get_friends(user_id: int) -> list[User]:
     with session_maker() as session:
@@ -65,3 +66,17 @@ def get_search_by_username(username: str) -> User | None:
             User.username == username          
         ).first()
     return result
+
+def delete_friend(user_id: int, friend_id: int) -> None:
+    with session_maker.begin() as session:
+        session.execute(Delete(Friend).where(
+            ((Friend.user_id == user_id and Friend.friend_id == friend_id) | (Friend.user_id == friend_id and Friend.friend_id == user_id)) &
+            (Friend.status == "accepted")
+        ))
+
+def reject_request(user_id: int, friend_id: int) -> None:
+    with session_maker.begin() as session:
+        session.execute(Delete(Friend).where(
+            ((Friend.user_id == user_id and Friend.friend_id == friend_id) | (Friend.user_id == friend_id and Friend.friend_id == user_id)) &
+            (Friend.status == "pending")
+        ))

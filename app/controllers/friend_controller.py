@@ -9,14 +9,14 @@ router = APIRouter(
     tags=["Friends"],
 )
 @router.get("/{user_id}/friends", response_model=list[dto.Friend])
-def get_friends(user_id: int, user: dependencies.user_dependency):
+def get_friends(user_id: int, user: dependencies.user_dependency) -> list[db.User]:
     if user.user_id != user_id:
         raise HTTPException(status_code=403, detail="Forbidden")
     friends = friend_service.get_friends(user_id)
     return friends
 
 @router.post("/{user_id}/friends/request")
-def sent_request(user_id: int, friend_id: int, user: dependencies.user_dependency):
+def sent_request(user_id: int, friend_id: int, user: dependencies.user_dependency) -> None:
     if user.user_id != user_id:
         raise HTTPException(status_code=403, detail="Forbidden")
     
@@ -30,7 +30,7 @@ def sent_request(user_id: int, friend_id: int, user: dependencies.user_dependenc
 
 # get friend requests
 @router.get("/{user_id}/friends/requests", response_model=list[dto.Friend])
-def get_requests(user_id: int, user: dependencies.user_dependency):
+def get_requests(user_id: int, user: dependencies.user_dependency)-> db.User:
     if user.user_id != user_id:
         raise HTTPException(status_code=403, detail="Forbidden")
 
@@ -38,7 +38,7 @@ def get_requests(user_id: int, user: dependencies.user_dependency):
     return pending_friend_requests 
 
 @router.post("/{user_id}/friends/requests/accept")
-def accept_request(user_id: int, friend_id: int, user: dependencies.user_dependency):
+def accept_request(user_id: int, friend_id: int, user: dependencies.user_dependency) -> None:
     if user.user_id != user_id:
         raise HTTPException(status_code=403, detail="Forbidden")
     friend_service.accept_request(user_id, friend_id)
@@ -54,6 +54,7 @@ def get_search_by_username(user_id: int,username: str, user: dependencies.user_d
     user = friend_service.get_search_by_username(username)
     if user is None:
         raise HTTPException(status_code=404, detail="User with username not found")
+    
     return dto.Friend(
         friend_id=user.user_id,
         username=user.username,
@@ -61,3 +62,15 @@ def get_search_by_username(user_id: int,username: str, user: dependencies.user_d
         avatar_url=user.avatar_url
     )
 
+@router.delete("/{user_id}/friends", status_code=204)
+def delete_friend(user_id: int, friend_id: int, user: dependencies.user_dependency) -> None:
+    if user.user_id != user_id:
+        raise HTTPException(status_code=403, detail="Forbidden")
+    friend_service.delete_friend(user_id, friend_id)
+    
+
+@router.delete("/{user_id}/friends/requests/reject", status_code=204)
+def reject_request(user_id: int, friend_id: int, user: dependencies.user_dependency) -> None:
+    if user.user_id != user_id:
+        raise HTTPException(status_code=403, detail="Forbidden")
+    friend_service.reject_request(user_id, friend_id)
