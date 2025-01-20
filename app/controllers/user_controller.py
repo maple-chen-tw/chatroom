@@ -33,7 +33,7 @@ def patch_user(user_id: int, user_data: dto.UpdateUser, user: dependencies.user_
     return updated_user
 
 @router.delete("/{user_id}", status_code=204)
-def delete_user(user_id: int, user: dependencies.user_dependency):
+def delete_user(user_id: int, user: dependencies.user_dependency) -> None:
 
     if user is None:
         raise HTTPException(status_code=404, detail="User not found")
