@@ -21,15 +21,14 @@ def get_user(token: Annotated[str, Depends(oauth2_scheme)])->db.User:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
-            raise credentials_exception
+            raise credentials_exception       
         token_data = TokenData(username=username)
+        user = user_service.get_by_username(token_data.username)
+        if user is None:
+            raise credentials_exception
+        
     except InvalidTokenError:
         raise credentials_exception
-    
-    user = user_service.get_by_username(token_data.username)
-    if user is None:
-        raise credentials_exception
-    
     return user
 
 user_dependency = Annotated[db.User, Depends(get_user)]

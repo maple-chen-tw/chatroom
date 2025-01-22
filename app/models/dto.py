@@ -7,10 +7,8 @@ class Token(BaseModel):
     access_token: str
     token_type: str
 
-
 class TokenData(BaseModel):
     username: str | None = None
-
 
 class User(BaseModel):
     user_id: int 
@@ -21,7 +19,6 @@ class User(BaseModel):
     status: str | None = None
     created_at: datetime
     updated_at: datetime 
-
 
 class UserInDB(User):
     hashed_password: str
@@ -39,7 +36,6 @@ class GetUser(BaseModel):
 class CreateUser(BaseModel):
     username: str
     password: str = Field(..., min_length=4)
-
 
 class UpdateUser(BaseModel):
     email: str | None = None
