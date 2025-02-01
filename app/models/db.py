@@ -26,3 +26,19 @@ class Friend(Base):
 
     user = relationship("User", foreign_keys=[user_id])
     friend = relationship("User", foreign_keys=[friend_id])
+
+class Chatroom(Base):
+    __tablename__ = 'chatrooms'
+    
+    chatroom_id = Column(Integer, primary_key=True, autoincrement=True)
+    chatroom_name = Column(String(32), nullable=True)  # Name of the chatroom (null for private chats)
+    created_at = Column(DateTime, default=func.current_timestamp())
+
+class Participant(Base):
+    __tablename__ = 'participants'
+    
+    chatroom_id = Column(Integer, ForeignKey('chatrooms.chatroom_id', ondelete='CASCADE'), primary_key=True)
+    user_id = Column(Integer, ForeignKey('users.user_id', ondelete='CASCADE'), primary_key=True)
+    
+    chatroom = relationship('Chatroom', back_populates='participants')
+    user = relationship('User', back_populates='participants')
