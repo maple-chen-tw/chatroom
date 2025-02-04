@@ -52,3 +52,8 @@ class Friend(BaseModel):
     username: str
     nickname: str | None = None
     avatar_url: str | None = None
+
+class Chatroom(BaseModel):
+    chatroom_id: int
+    chatroom_name: str | None = None
+    friend_name: str

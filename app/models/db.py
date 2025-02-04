@@ -34,11 +34,13 @@ class Chatroom(Base):
     chatroom_name = Column(String(32), nullable=True)  # Name of the chatroom (null for private chats)
     created_at = Column(DateTime, default=func.current_timestamp())
 
+    #participants = relationship("Participant", back_populates="chatroom")
+
 class Participant(Base):
     __tablename__ = 'participants'
     
     chatroom_id = Column(Integer, ForeignKey('chatrooms.chatroom_id', ondelete='CASCADE'), primary_key=True)
     user_id = Column(Integer, ForeignKey('users.user_id', ondelete='CASCADE'), primary_key=True)
     
-    chatroom = relationship('Chatroom', back_populates='participants')
-    user = relationship('User', back_populates='participants')
+    # chatroom = relationship('Chatroom', back_populates='participants')
+    # user = relationship('User', back_populates='participants')
