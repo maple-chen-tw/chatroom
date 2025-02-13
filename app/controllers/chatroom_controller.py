@@ -18,7 +18,7 @@ def get_chatrooms(user_id: int, user: dependencies.user_dependency) -> list[db.C
     return chatrooms
 
 @router.post("/chatrooms", response_model=dto.Chatroom)
-def add_chatroom(user_id: int, members_id: list[int], user: dependencies.user_dependency, chatroom_name: str = None) -> None:
+def add_chatroom(user_id: int, members_id: list[int], user: dependencies.user_dependency, chatroom_name: str = None) -> db.Chatroom:
     if user.user_id != user_id:
         raise HTTPException(status_code=403, detail="Forbidden")
     if user_id not in members_id:
@@ -40,10 +40,13 @@ def add_chatroom(user_id: int, members_id: list[int], user: dependencies.user_de
         friend_name=friend_name
     )
 
-
-@router.get("/chatrooms/{chatroom_id}", response_model=None)
-def get_chatroom(chatroom_id: int, user: dependencies.user_dependency) -> None:
-    return
+# Retrieves the details of the chatroom
+@router.get("/chatrooms/{chatroom_id}",response_model=dto.Chatroom)
+def get_chatroom(user_id: int, chatroom_id: int, user: dependencies.user_dependency) -> db.Chatroom:
+    if user.user_id != user_id:
+        raise HTTPException(status_code=403, detail="Forbidden")
+    chatroom = chatroom_service.get_chatroom(chatroom_id)
+    return chatroom
 
 @router.post("/chatrooms/{chatroom_id}", response_model=None)
 def update_chatroom(chatroom_id: int, user: dependencies.user_dependency) -> None:
