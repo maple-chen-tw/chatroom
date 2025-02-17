@@ -1,38 +1,21 @@
 <template>
-	<div class="flex flex-col">
-		<div class="flex bg-black px-2 py-5 lg:h-16 w-full space-x-2 justify-between">
-			<SVGLoader 
-				:class="'rotate-[270deg] cursor-pointer md:hidden'"
-				:icon="'back-arrow'"
-				@click="onPageBack" />
+	<div class="flex flex-col md:block pl-2 pr-2 border border-[#363636]">
+		<div class="flex p-3 space-x-3 sm:hover:bg-slate-1100 w-full">
+				<!-- Profile Image -->
+				<img 
+					:src="currentUser?.profilePictureUrl"
+					class="cursor-pointer h-14 w-14 rounded-full shadow-lg" />
 
-			<div class="cursor-pointer font-sans text-xl font-bold text-white pt-1">
-				{{ currentUser?.userName }}
-			</div>
-				
-			<div 
-				class="flex cursor-pointer"
-				@click="emitNewMessage()">
-				<SVGLoader 
-					:icon="'new-message'" />
-			</div>
-		</div>
-
-		<div class="flex bg-black pl-5 pr-5 pb-2 w-full space-x-2 justify-between">
-			<div class="flex">
-				<div class="cursor-pointer font-sans text-md font-bold text-white pt-1">
-					Messages
+				<div class="flex flex-col self-center space-y-2 pb-3">
+					<span class="font-sans text-xs sm:text-sm font-semibold text-white self-start">
+						{{ currentUser?.userName }}
+					</span>
+					<div class="flex flex-row space-x-1">
+						<span class="font-sans text-xs font-semibold text-gray-400">
+							Status - gogogo
+						</span>
+					</div>
 				</div>
-
-				<div class="flex space-x-4 cursor-pointer">
-				</div>
-			</div>
-
-			<div></div>
-				
-			<div class="cursor-pointer font-sans text-xs font-semibold text-[#949494] pt-1">
-				Requests
-			</div>
 		</div>
 	</div>
 </template>

@@ -5,28 +5,18 @@
             <!-- Navigation and Messages overview -->
             <div class="flex flex-col h-full w-2/5">
                 <!-- activePanel -->
-                <div> Direct: {{ activePanel }}</div>
-
                 <InboxPanel
                   :active-panel="activePanel"
-                  v-if="activePanel === 'home'"
-                  :active-conversation="activeConversation"
-                  :conversations="conversations"
+                  v-if="activePanel === 'user'"
+                  :active-conversation=activeConversation
+                  :conversations=conversations
                   :current-user="currentUser"
                   @on-select-conversation="selectConversation"
                 />
               
                 <InboxPanel
                   :active-panel="activePanel"
-                  v-if="activePanel === 'comments'"
-                  :active-conversation="activeConversation"
-                  :conversations="conversations"
-                  :current-user="currentUser"
-                  @on-select-conversation="selectConversation"
-                />
-            <!-- 
-                <InboxPanel
-                  v-if="activePanel === 'search'"
+                  v-if="activePanel === 'chat'"
                   :active-conversation="activeConversation"
                   :conversations="conversations"
                   :current-user="currentUser"
@@ -34,13 +24,21 @@
                 />
 
                 <InboxPanel
-                  v-if="activePanel === 'likes'"
-                  :active-conversation="activeConversation"
-                  :conversations="conversations"
+                  :active-panel="activePanel"
+                  v-if="activePanel === 'plus'"
+                  :active-conversation=undefined
+                  :conversations=undefined
                   :current-user="currentUser"
-                  @on-select-conversation="selectConversation"
                 />
-               --> 
+
+                <InboxPanel
+                  :active-panel="activePanel"
+                  v-if="activePanel === 'options'"
+                  :active-conversation=undefined
+                  :conversations=undefined
+                  :current-user="currentUser"
+                />
+
                 <InboxBottom class="mt-auto" @icon-click="changePanel"/>
             </div>
 
@@ -154,7 +152,7 @@ const chatMessage = ref<ChatDialog>({
 })
 
 // Change InboxPanel
-const activePanel = ref('home')
+const activePanel = ref('chat')
 const changePanel = (panel: string) => {
   activePanel.value = panel
 }

@@ -5,10 +5,18 @@
 		<!-- Inbox Header  -->
 		<InboxHeader 
 			:current-user="currentUser" />
-        <div> this is {{ activePanel }}</div>
+
 		<!-- Inbox Rendering -->
 		<div class="overflow-auto lg:max-h-[850px]">
-            <div v-if="activePanel === 'home'">
+            <div v-if="activePanel === 'user'">
+			<!-- Inbox items-->
+			<InboxFriends 
+				:active-conversation-id="activeConversation?.uuid"
+				:conversations="conversations"
+				@on-select-conversation="$emit('onSelectConversation', $event as Conversation)" />
+            </div>
+
+            <div v-if="activePanel === 'chat'">
 			<!-- Inbox items-->
 			<InboxMessages 
 				:active-conversation-id="activeConversation?.uuid"
@@ -16,10 +24,16 @@
 				@on-select-conversation="$emit('onSelectConversation', $event as Conversation)" />
             </div>
 
-            <div v-if="activePanel === 'comment'">
+            <div v-if="activePanel === 'plus'">
 			<!-- Inbox items-->
-                <div>qaq</div>
+                <div>user-plus</div>
             </div>
+
+            <div v-if="activePanel === 'options'">
+			<!-- Inbox items-->
+                <div>options</div>
+            </div>
+
 		</div>
 
 	</div>
@@ -29,6 +43,7 @@
 <script setup lang="ts">
 import {
     InboxMessages,
+    InboxFriends,
     InboxHeader
 } from '@/components'
 
