@@ -12,7 +12,7 @@
 					</span>
 					<div class="flex flex-row space-x-1">
 						<span class="font-sans text-xs font-semibold text-gray-400">
-							Status - gogogo
+							{{ currentUser?.status }}
 						</span>
 					</div>
 				</div>

@@ -14,19 +14,29 @@
 				class="cursor-pointer h-14 w-14 rounded-full shadow-lg" />
 
 
-			<!-- Username / Chat / Date -->
+			<!-- Username -->
 			<div class="flex flex-col self-center space-y-2 pb-3">
 				<span class="font-sans text-xs sm:text-sm font-semibold text-white self-start">
 					{{ convo.user.userName }}
 				</span>
-
-				<div class="flex flex-row space-x-1">
-					<span class="font-sans text-xs font-semibold text-gray-400">
-						{{ convo.user.status }}
-					</span>
-
-				</div>
 			</div>
+
+            <!-- V and X buttons -->
+            <div class="flex space-x-2">
+              <!-- V Button (Accept) -->
+              <button 
+                @click.stop="acceptFriendRequest(convo)"
+                class="text-green-500 hover:text-green-700 text-sm font-semibold">
+                [V]
+              </button>
+
+              <!-- X Button (Reject) -->
+              <button 
+                @click.stop="rejectFriendRequest(convo)"
+                class="text-red-500 hover:text-red-700 text-sm font-semibold">
+                [X]
+              </button>
+            </div>
 		</div>
 	</div>
 </template>
@@ -59,4 +69,22 @@ const emitSelectConversation = (conversation: Conversation) => {
 const formatedDate = (date: string) => {
 	return new Date(date).toLocaleDateString()
 }
+
+/**
+ * Accept friend request
+ */
+ const acceptFriendRequest = (convo: Conversation) => {
+  console.log(`Friend request accepted for ${convo.user.userName}`)
+  // Add logic to accept the friend request
+}
+
+/**
+ * Reject friend request
+ */
+const rejectFriendRequest = (convo: Conversation) => {
+  console.log(`Friend request rejected for ${convo.user.userName}`)
+  // Add logic to reject the friend request
+}
+
+
 </script>

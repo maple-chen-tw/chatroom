@@ -38,6 +38,7 @@ export class UserSample implements User {
     userName = faker.internet.userName()
     profilePictureUrl = faker.image.avatar()
     email = faker.internet.email()
+    status = faker.lorem.sentence()
     followerCount = faker.number.int({ min: 2, max: 1000 })
     followingCount = faker.number.int({ min: 2, max: 1000 })
     gender = 'Other' as User['gender']

@@ -25,6 +25,9 @@ export interface BaseUser {
   /** User's email */
   email?: string
 
+  /** User's status*/
+  status?: string
+
   /** Number of posts on the user's profile */
   mediaCount?: number
   

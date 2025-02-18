@@ -26,7 +26,12 @@
 
             <div v-if="activePanel === 'plus'">
 			<!-- Inbox items-->
-                <div>user-plus</div>
+            <div>user-plus</div>
+            <InboxAddFriends
+                :active-conversation-id="activeConversation?.uuid"
+				:conversations="conversations"
+				@on-select-conversation="$emit('onSelectConversation', $event as Conversation)"
+                />
             </div>
 
             <div v-if="activePanel === 'options'">
@@ -44,7 +49,8 @@
 import {
     InboxMessages,
     InboxFriends,
-    InboxHeader
+    InboxHeader,
+    InboxAddFriends
 } from '@/components'
 
 import type {
