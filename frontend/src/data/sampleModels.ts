@@ -16,6 +16,7 @@ import type {
     ChatDialog,
     User,
     Conversation,
+    Invitation,
     PostMedia,
     ReelPost,
     ReelMedia,
@@ -223,4 +224,14 @@ export class ReelPostSample implements ReelPost {
     commentCount = faker.number.int({ min: 2, max: 1000 })
     comments = []
     reelMedia = SampleGenerator.generateReelMedia()
+}
+
+/**
+ * Represents a fake Invitation model.
+ * @implements {Invitation}
+ */
+export class InvitationSample implements Invitation {
+    uuid = faker.string.uuid()
+    user = new UserSample()
+    isAccepted = faker.datatype.boolean()
 }

@@ -112,3 +112,17 @@ export interface Viewer extends User {
 export interface Sender extends User {
 
 }
+
+/**
+ * Represent a Friend Invitation instance between two users.
+ */
+export interface Invitation {
+    /** Unique identifier for the Invitation */
+    uuid: string
+
+    /** User who initiated the Invitation */
+    user: Sender
+
+    /** Indicates if the Invitation is currently accepted */
+    isAccepted: boolean
+}

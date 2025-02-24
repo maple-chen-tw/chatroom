@@ -6,34 +6,37 @@
             <div class="flex flex-col h-full w-2/5">
                 <!-- activePanel -->
                 <InboxPanel
-                  :active-panel="activePanel"
                   v-if="activePanel === 'user'"
-                  :active-conversation=activeConversation
-                  :conversations=conversations
+                  :conversations="conversations"
+                  :invitations=undefined
+                  :active-panel="activePanel"
+                  :activeConversation="activeConversation"
                   :current-user="currentUser"
                   @on-select-conversation="selectConversation"
                 />
               
                 <InboxPanel
-                  :active-panel="activePanel"
                   v-if="activePanel === 'chat'"
-                  :active-conversation="activeConversation"
                   :conversations="conversations"
+                  :invitations=undefined
+                  :active-panel="activePanel"
+                  :activeConversation="activeConversation"
                   :current-user="currentUser"
                   @on-select-conversation="selectConversation"
                 />
-
+            
                 <InboxPanel
-                  :active-panel="activePanel"
                   v-if="activePanel === 'plus'"
-                  :active-conversation=undefined
                   :conversations=undefined
+                  :invitations="invitations"
+                  :active-panel="activePanel"
+                  :activeConversation=undefined
                   :current-user="currentUser"
                 />
 
                 <InboxPanel
-                  :active-panel="activePanel"
                   v-if="activePanel === 'options'"
+                  :active-panel="activePanel"
                   :active-conversation=undefined
                   :conversations=undefined
                   :current-user="currentUser"
@@ -105,8 +108,10 @@ import {
 import {
     ChatDialogSample,
     ConversationSample, 
-    UserSample
+    UserSample,
+    InvitationSample
 } from '@/data'
+import { Invitation } from '../common'
 
 // References to DOM element
 const fileUpload = ref<HTMLInputElementRef | null>()
@@ -131,6 +136,9 @@ const conversationSampleA = new ConversationSample()
 const conversationSampleB = new ConversationSample()
 const conversationSampleC = new ConversationSample()
 
+const invitationSampleA = new InvitationSample()
+const invitationSampleB = new InvitationSample()
+const invitationSampleC = new InvitationSample()
 
 const currentUser: Sender = sender
 
@@ -140,6 +148,16 @@ const conversations = ref<Conversation[]>([
     conversationSampleB,
     conversationSampleC
 ])
+
+// List of all invitations in the inbox
+const invitations = ref<Invitation[]>([
+    invitationSampleA,
+    invitationSampleB,
+    invitationSampleC
+])
+console.log(invitations.value);
+
+
 
 // Active Chat Message
 const chatMessage = ref<ChatDialog>({

@@ -9,7 +9,7 @@
 		<!-- Inbox Rendering -->
 		<div class="overflow-auto lg:max-h-[850px]">
             <div v-if="activePanel === 'user'">
-			<!-- Inbox items-->
+			<!-- user -->
 			<InboxFriends 
 				:active-conversation-id="activeConversation?.uuid"
 				:conversations="conversations"
@@ -17,7 +17,7 @@
             </div>
 
             <div v-if="activePanel === 'chat'">
-			<!-- Inbox items-->
+			<!-- chat -->
 			<InboxMessages 
 				:active-conversation-id="activeConversation?.uuid"
 				:conversations="conversations"
@@ -25,17 +25,15 @@
             </div>
 
             <div v-if="activePanel === 'plus'">
-			<!-- Inbox items-->
-            <div>user-plus</div>
+			<!-- plus -->
             <InboxAddFriends
-                :active-conversation-id="activeConversation?.uuid"
-				:conversations="conversations"
-				@on-select-conversation="$emit('onSelectConversation', $event as Conversation)"
+                :invitations="invitations"
                 />
+            <!-- plus qq -->
             </div>
 
             <div v-if="activePanel === 'options'">
-			<!-- Inbox items-->
+			<!-- options -->
                 <div>options</div>
             </div>
 
@@ -55,17 +53,22 @@ import {
 
 import type {
     Conversation,
+    Invitation,
     Viewer
 } from '@/common'
 
 defineProps({
     conversations: {
-        type: Object as() => Conversation[] | undefined,
-        required: true
+        type: Array as() => Conversation[] | undefined,
+        required: false
+    },
+    invitations: {
+        type: Array as() => Invitation[] | undefined,
+        required: false
     },
     activeConversation: {
         type: Object as() => Conversation | undefined,
-        required: true
+        required: false
     },
     currentUser: {
         type: Object as() => Viewer,
