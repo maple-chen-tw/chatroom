@@ -10,45 +10,40 @@
                   :conversations="conversations"
                   :invitations=undefined
                   :active-panel="activePanel"
-                  :activeConversation="activeConversation"
+                  :activeConversation=undefined
                   :current-user="currentUser"
                   @on-select-conversation="selectConversation"
                 />
-              
+
                 <InboxPanel
-                  v-if="activePanel === 'chat'"
-                  :conversations="conversations"
-                  :invitations=undefined
-                  :active-panel="activePanel"
-                  :activeConversation="activeConversation"
-                  :current-user="currentUser"
-                  @on-select-conversation="selectConversation"
-                />
-            
-                <InboxPanel
-                  v-if="activePanel === 'plus'"
+                  v-else-if="activePanel === 'plus'"
                   :conversations=undefined
                   :invitations="invitations"
                   :active-panel="activePanel"
                   :activeConversation=undefined
                   :current-user="currentUser"
                 />
-
+              
                 <InboxPanel
-                  v-if="activePanel === 'options'"
+                  v-else
+                  :conversations="conversations"
+                  :invitations=undefined
                   :active-panel="activePanel"
-                  :active-conversation=undefined
-                  :conversations=undefined
+                  :activeConversation=undefined
                   :current-user="currentUser"
+                  @on-select-conversation="selectConversation"
                 />
-
+            
                 <InboxBottom class="mt-auto" @icon-click="changePanel"/>
             </div>
 
             <!-- Chat input and Dialogs -->
-
+            <ActiveInfo
+                v-if="activePanel === 'options'"
+                :current-user="currentUser"
+                />
             <ActiveChat 
-                v-if="activeConversation"
+                v-else-if="activeConversation"
                 :active-conversation="activeConversation"
                 v-model="chatMessageInput"
                 :current-user="currentUser"
@@ -57,12 +52,15 @@
                 @on-chat-back="leaveChat"
                 @on-file-upload="triggerFileUpload"
                 @on-send-message="sendMessage"
-                @on-like-icon="sendHeartEmoji" />
+                @on-like-icon="sendHeartEmoji"
+                />
+
 
             <!-- Chat intro -->
             <ChatIntroMessage 
                 v-else
                 @on-send-message-modal="openSendMessageModal" />
+
 
         </div>
     </div>
@@ -90,6 +88,7 @@ import {
 	ActiveChat,
 	InboxPanel,
     InboxBottom,
+    ActiveInfo
 } from '@/components'
 
 import type {
@@ -97,7 +96,8 @@ import type {
     ChatDialog,
     HTMLInputElementRef,
     PhotoModalImage,
-    Conversation
+    Conversation,
+    Invitation
 } from '@/common'
 
 import {
@@ -111,7 +111,6 @@ import {
     UserSample,
     InvitationSample
 } from '@/data'
-import { Invitation } from '../common'
 
 // References to DOM element
 const fileUpload = ref<HTMLInputElementRef | null>()
@@ -173,6 +172,7 @@ const chatMessage = ref<ChatDialog>({
 const activePanel = ref('chat')
 const changePanel = (panel: string) => {
   activePanel.value = panel
+  activeConversation.value = undefined
 }
 watch(activePanel, (newValue) => {
   console.log("activePanel changed:", newValue);

@@ -8,7 +8,14 @@
 
 		<!-- Inbox Rendering -->
 		<div class="overflow-auto lg:max-h-[850px]">
-            <div v-if="activePanel === 'user'">
+
+            <div v-if="activePanel === 'plus'">
+			<!-- plus -->
+            <InboxAddFriends
+                :invitations="invitations"
+                />
+            </div>
+            <div v-else-if="activePanel === 'user'">
 			<!-- user -->
 			<InboxFriends 
 				:active-conversation-id="activeConversation?.uuid"
@@ -16,25 +23,12 @@
 				@on-select-conversation="$emit('onSelectConversation', $event as Conversation)" />
             </div>
 
-            <div v-if="activePanel === 'chat'">
+            <div v-else>
 			<!-- chat -->
 			<InboxMessages 
 				:active-conversation-id="activeConversation?.uuid"
 				:conversations="conversations"
 				@on-select-conversation="$emit('onSelectConversation', $event as Conversation)" />
-            </div>
-
-            <div v-if="activePanel === 'plus'">
-			<!-- plus -->
-            <InboxAddFriends
-                :invitations="invitations"
-                />
-            <!-- plus qq -->
-            </div>
-
-            <div v-if="activePanel === 'options'">
-			<!-- options -->
-                <div>options</div>
             </div>
 
 		</div>
@@ -48,7 +42,8 @@ import {
     InboxMessages,
     InboxFriends,
     InboxHeader,
-    InboxAddFriends
+    InboxAddFriends,
+    ActiveInfo
 } from '@/components'
 
 import type {

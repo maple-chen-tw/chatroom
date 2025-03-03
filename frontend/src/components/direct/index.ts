@@ -9,6 +9,7 @@ import InboxPanel from './InboxPanel.vue'
 import InboxBottom from './InboxBottom.vue'
 import InboxFriends from './InboxFriends.vue'
 import InboxAddFriends from './InboxAddFriends.vue'
+import ActiveInfo from './ActiveInfo.vue'
 export {
   ActiveChat,
   InboxPanel,
@@ -17,6 +18,7 @@ export {
   InboxBottom,
   InboxFriends,
   InboxAddFriends,
+  ActiveInfo,
   ChatIntroMessage,
   ChatHeader,
   ChatMessage,
