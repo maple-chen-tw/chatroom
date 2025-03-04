@@ -1,6 +1,6 @@
 <template>
 	<div 
-		class="relative bg-black lg:basis-10/12 max-h-full
+		class="relative bg-black lg:basis-9/12 max-h-full
         w-full h-dynamic-screen sm:h-screen border-l border-gray-800 flex flex-col">
 		<ChatHeader
 			:viewer="activeConversation?.user"

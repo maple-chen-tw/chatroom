@@ -1,26 +1,58 @@
 <template>
-	<div>
-        會員資料設定
-    </div>
+    <div
+        class="md:grid bg-black border-l border-slate-800
+        lg:basis-9/12 w-full md:h-full h-screen hidden">
+        
+        <div class="flex flex-col pl-2 pr-2 text-white font-bold">
+            會員資料設定
+        </div>
 
-	<div class="flex flex-col md:block pl-2 pr-2">
-	    <div class="flex justify-between p-3 space-x-3 sm:hover:bg-slate-1100 w-full cursor-pointer">
-          <div class="flex items-center space-x-3">
-	    		  <!-- Profile Image -->
-	    		  <img 
-	    		  	:src="currentUser?.profilePictureUrl"
-	    		  	class="cursor-pointer h-14 w-14 rounded-full shadow-lg" />
+        <div 
+			class="grid grid-cols-[auto,1fr] p-3 space-x-3 w-full mr-4">
+            <div class="flex items-center space-x-3">
+	        		  <img 
+	        		  	:src="currentUser?.profilePictureUrl"
+	        		  	class="cursor-pointer h-20 w-20 rounded-full shadow-lg" /> <div class="flex flex-col space-y-4">
+                    <!-- Username with Edit icon -->
+                    <div class="flex items-center space-x-2">
+                        <span class="font-sans text-xs sm:text-sm font-semibold text-white self-start">
+                            暱稱  
+                        </span>
+                        <span class="font-sans text-xs sm:text-sm font-semibold text-white self-start">
+                            {{ currentUser?.userName }}
+                        </span>
+                        <button class="text-white text-xs sm:text-sm hover:bg-slate-700 p-1 rounded">
+                            <i class="fas fa-pencil-alt"></i>
+                        </button>
+                    </div>
 
-	    		  <!-- Username -->
-	    		  <div class="flex flex-col self-center space-y-2 pb-3">
-	    		  	<span class="font-sans text-xs sm:text-sm font-semibold text-white self-start">
-	    		  		{{ currentUser?.userName }}
-	    		  	</span>
-	    		  </div>
-          </div>
+                    <div class="flex items-center space-x-2">
+                        <span class="font-sans text-xs sm:text-sm font-semibold text-white self-start">
+                            狀態  
+                        </span>
+                        <span class="font-sans text-xs sm:text-sm font-semibold text-white self-start overflow-hidden">
+                            {{ currentUser?.status }}
+                        </span>
+                        <button class="text-white text-xs sm:text-sm hover:bg-slate-700 p-1 rounded flex-wrap mr-2">
+                            <i class="fas fa-pencil-alt"></i>
+                        </button>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="flex items-center space-x-2">
+                        <span class="font-sans text-xs sm:text-sm font-semibold text-white self-start">
+                            Email  
+                        </span>
+                        <span class="font-sans text-xs sm:text-sm font-semibold text-white self-start">
+                            {{ currentUser?.email }}
+                        </span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </template>
+
 
 
 <script setup lang="ts">
