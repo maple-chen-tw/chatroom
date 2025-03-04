@@ -1,5 +1,8 @@
 <template>
     <div class="sm:min-h-screen h-screen min-w-screen bg-black md:max-w-full mx-auto sm:h-screen scrollbar scrollbar-thumb-gray-900">
+        <TopLogoutBar
+            v-if="!isTopLogoutBarHidden"/>
+        
         <TopNavBar 
             v-if="!isTopNavBarHidden" />
 
@@ -36,6 +39,7 @@ import {
     TopNavBar,
     BottomNavBar,
     SideNavBar,
+    TopLogoutBar,
     Modals
 } from '@/components'
 
@@ -45,10 +49,12 @@ import {
 } from '@/stores'
 
 // Routes without no top/bottom navbars
-const topNavBarHiddenRoutes = ['style', 'stories', 'direct', 'reels', 'explore']
+const topNavBarHiddenRoutes = ['style', 'stories', 'reels', 'explore','direct']
 const bottomNavBarHiddenRoutes = ['stories', 'style', 'direct']
-const sideNavBarHiddenRoutes = ['stories']
+const sideNavBarHiddenRoutes = ['stories', 'direct']
 const collapsedHiddenRoutes = ['direct']
+
+const topLogoutBarHiddenRoutes = ['style', 'stories', 'reels', 'explore']
 
 // Services
 const route = useRoute()
@@ -78,5 +84,9 @@ const isBottomNavBarHidden = computed(() => {
 
 const isTopNavBarHidden = computed(() => {
     return topNavBarHiddenRoutes.includes(routeName.value)
+})
+
+const isTopLogoutBarHidden = computed(() => {
+    return topLogoutBarHiddenRoutes.includes(routeName.value)
 })
 </script>
