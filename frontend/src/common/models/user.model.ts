@@ -8,10 +8,10 @@ export interface BaseUser {
   id: string
 
   /** User's first name */
-  firstName: string
+  // firstName: string
 
   /** User's last name */
-  lastName: string
+  // lastName: string
 
   /** User's user name */
   userName: string
@@ -29,20 +29,20 @@ export interface BaseUser {
   status?: string
 
   /** Number of posts on the user's profile */
-  mediaCount?: number
+  //mediaCount?: number
   
   /** Number of followers the user has */
-  followerCount: number
+  //followerCount: number
 
   /** Number of users the user is following */
-  followingCount: number
+  //followingCount: number
 
   /** Relationship with other users */
-  friendShip?: FriendShipStatus
+  //friendShip?: FriendShipStatus
 
-  followers?: BaseUser[]
+  //followers?: BaseUser[]
 
-  following?: BaseUser[]
+  //following?: BaseUser[]
 }
 
 /**
@@ -75,7 +75,7 @@ export interface User extends BaseUser {
     biography?: string
   
     /** Posts made by the user's */
-    mediaItems: PostCard[]
+    //mediaItems: PostCard[]
   }
   
 

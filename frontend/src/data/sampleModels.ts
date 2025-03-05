@@ -34,23 +34,23 @@ import type {
  */
 export class UserSample implements User {
     id = faker.string.uuid()
-    firstName = faker.person.firstName()
-    lastName = faker.person.lastName()
+    //firstName = faker.person.firstName()
+    //lastName = faker.person.lastName()
     userName = faker.internet.userName()
     profilePictureUrl = faker.image.avatar()
     email = faker.internet.email()
     status = faker.lorem.sentence()
-    followerCount = faker.number.int({ min: 2, max: 1000 })
-    followingCount = faker.number.int({ min: 2, max: 1000 })
-    gender = 'Other' as User['gender']
-    friendShip = {
-        muting: faker.datatype.boolean(),
-        isMutingReel: faker.datatype.boolean(),
-        following: faker.datatype.boolean(),
-        outgoingRequest: faker.datatype.boolean()
-    }
+    //followerCount = faker.number.int({ min: 2, max: 1000 })
+    //followingCount = faker.number.int({ min: 2, max: 1000 })
+    //gender = 'Other' as User['gender']
+    //friendShip = {
+    //    muting: faker.datatype.boolean(),
+    //    isMutingReel: faker.datatype.boolean(),
+    //    following: faker.datatype.boolean(),
+    //    outgoingRequest: faker.datatype.boolean()
+    //}
     dateJoined = faker.date.past().toISOString()
-    mediaItems = SampleGenerator.generateRandomPosts()
+    //mediaItems = SampleGenerator.generateRandomPosts()
 }
 
 /**

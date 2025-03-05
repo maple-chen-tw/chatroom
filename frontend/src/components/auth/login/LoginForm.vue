@@ -179,9 +179,9 @@ const login = async () => {
     		}
 		})
 
-        const { token } = response.data
+        const { access_token } = response.data
 
-        localStorage.setItem('auth-token', token)
+        localStorage.setItem('auth-token', access_token)
 
         toast.success('Success. Redirecting...')
 

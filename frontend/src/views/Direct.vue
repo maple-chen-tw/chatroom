@@ -117,15 +117,36 @@ import {
 } from 'vue-router'
 
 import { onMounted } from 'vue';
+import axios from "axios";
 
+import { User } from '@/common'
+import jwt_decode from "jwt-decode";
 const router = useRouter()
-const token = localStorage.getItem('auth-token');
 
+const token = localStorage.getItem('auth-token');
+const user = ref<User | null>(null);
 onMounted(() => {
     if (!token) {
         router.push('/accounts/login');
     }
+
+    if (token) {
+        //const decodedToken = jwt_decode(token);
+        //const userId = decodedToken.user_id;
+        axios.get("/user/me", {
+          headers: {
+            "Authorization": `Bearer ${token}`
+          }
+        })
+        .then(response => {
+          console.log("User info:", response.data);
+        })
+        .catch(error => {
+          console.error("Error fetching user info:", error);
+        });
+    }
 });
+
 
 // References to DOM element
 const fileUpload = ref<HTMLInputElementRef | null>()
