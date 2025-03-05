@@ -23,7 +23,7 @@
 				<div class="mb-2">
 					<TheInput
 						v-model="loginForm.username" 
-						placeholder="Phone number, username, or email" 
+						placeholder="Username, or email" 
 						:class="{
 							'border-red-400': v$.username.$dirty && v$.username.$invalid 
 						}"

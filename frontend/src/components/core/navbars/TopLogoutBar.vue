@@ -17,7 +17,9 @@ const toast = useToast()
 const logout = () => {
     // TODO: Add logout logic and make a universal logout function
     toast.success('Logout successful')
-    //   Sleep for 2 seconds
+    // Remove token
+    localStorage.removeItem('auth-token');
+    // Sleep for 2 seconds
     setTimeout(() => {
         router.push('/accounts/login')
     }, 2000)

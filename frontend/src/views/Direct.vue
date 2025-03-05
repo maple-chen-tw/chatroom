@@ -112,6 +112,21 @@ import {
     InvitationSample
 } from '@/data'
 
+import { 
+	useRouter 
+} from 'vue-router'
+
+import { onMounted } from 'vue';
+
+const router = useRouter()
+const token = localStorage.getItem('auth-token');
+
+onMounted(() => {
+    if (!token) {
+        router.push('/accounts/login');
+    }
+});
+
 // References to DOM element
 const fileUpload = ref<HTMLInputElementRef | null>()
 
