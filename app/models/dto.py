@@ -38,7 +38,6 @@ class CreateUser(BaseModel):
     password: str = Field(..., min_length=4)
 
 class UpdateUser(BaseModel):
-    email: str | None = None
     nickname: str | None = None 
     avatar_url: str | None = None 
     status: str | None = None

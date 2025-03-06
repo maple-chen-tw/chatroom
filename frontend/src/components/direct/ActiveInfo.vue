@@ -21,7 +21,7 @@
                                 暱稱  
                             </span>
                             <span v-if="!isEditingNickname" class="font-sans sm:text-sm font-semibold text-white self-start overflow-hidden">
-                                {{ currentUser?.nickName }}
+                                {{ currentUser?.nickname }}
                             </span>
                             <input
                                 v-else
@@ -88,6 +88,7 @@ import type {
 import {
     ref,
 } from 'vue'
+import axios from "axios";
 
 const props = defineProps({
     currentUser: {
@@ -97,6 +98,7 @@ const props = defineProps({
 })
 const isEditingStatus = ref(false);
 const editedStatus = ref("");
+const emit = defineEmits(["updateUser"]);
 
 const isEditingNickname = ref(false);
 const editedNickname = ref("");
@@ -111,10 +113,14 @@ const toggleEditStatus = async () => {
 };
 const saveStatus = async () => {
   try {
-    //const response = await axios.put("/user/update-status", {
-    //  status: editedStatus.value,
-    //});
-    //currentUser.value.status = editedStatus.value; // 更新 UI
+    const response = await axios.patch(`/user/${props.currentUser.id}`, {
+      status: editedStatus.value,
+    },{
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("auth-token")}`
+        }
+    });
+    emit("updateUser", { ...props.currentUser, status: editedStatus.value });
     isEditingStatus.value = false;
 
     //console.log("Status updated:", response.data);
@@ -127,16 +133,21 @@ const toggleEditedNickname = async () => {
   if (isEditingNickname.value) {
     await saveNickname();
   } else {
-    editedNickname.value = props.currentUser?.nickName || "尚未設定暱稱";
+    editedNickname.value = props.currentUser?.nickname || "尚未設定暱稱";
     isEditingNickname.value = true;
   }
 };
 const saveNickname = async () => {
   try {
-    //const response = await axios.put("/user/update-nickname", {
-    //  status: editedNickname.value,
-    //});
-    //currentUser.value.nickname = editedNickname.value; // 更新 UI
+    const response = await axios.patch(`/user/${props.currentUser.id}`, {
+        nickname: editedNickname.value,
+    },{
+        headers: {
+            "Authorization": `Bearer ${localStorage.getItem("auth-token")}`
+        }
+    });
+
+    emit("updateUser", { ...props.currentUser, nickname: editedNickname.value });
     isEditingNickname.value = false;
 
     //console.log("Nickname updated:", response.data);

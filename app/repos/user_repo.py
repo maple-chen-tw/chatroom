@@ -32,10 +32,8 @@ def get(limit:int = 1000, offset: int = 0) -> list[User]:
     with session_maker() as session:
         return session.query(User).limit(limit).offset(offset).all()
 
-def update(user_id: int, email: str, nickname: str, avatar_url: str, status:str) -> User | None:
+def update(user_id: int, nickname: str, avatar_url: str, status:str) -> User | None:
     update_data = {}
-    if email not in [None, '']:
-        update_data[User.email] = email
     if nickname is not None:
         update_data[User.nickname] = nickname
     if avatar_url is not None:

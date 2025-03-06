@@ -22,7 +22,6 @@ def get_by_username(username: int) -> User | None:
 def update(user_id: int, user_data: dto.UpdateUser) -> User:
     return user_repo.update(
         user_id, 
-        user_data.email, 
         user_data.nickname, 
         user_data.avatar_url, 
         user_data.status

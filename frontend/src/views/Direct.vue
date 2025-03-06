@@ -139,14 +139,13 @@ onMounted(() => {
           }
         })
         .then(response => {
-          //console.log("User info:", response.data);
           user.value = {
             id: response.data.user_id,
             userName:response.data.username,
             profilePictureUrl:response.data.avatar_url,
             email:response.data.email,
             status:response.data.status,
-            nickName:response.data.nickname,
+            nickname:response.data.nickname,
             dateJoined: response.data.created_at,
             lastModifiedAt: response.data.updated_at,
           }

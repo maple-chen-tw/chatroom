@@ -12,12 +12,14 @@ export interface BaseUser {
 
   /** User's last name */
   // lastName: string
-
+  /** User's nick name */
+  nickname: string
+  
   /** User's user name */
   userName: string
 
   /** User's gender */
-  gender: 'Female' | 'Male' | 'Other'
+  //gender: 'Female' | 'Male' | 'Other'
 
   /** URL of the user's profile picture */
   profilePictureUrl: string
