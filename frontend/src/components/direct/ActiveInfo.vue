@@ -20,11 +20,18 @@
                             <span class="font-sans text-xs sm:text-sm font-semibold text-white self-start">
                                 暱稱  
                             </span>
-                            <span class="font-sans text-xs sm:text-sm font-semibold text-white self-start">
-                                {{ currentUser?.userName }}
+                            <span v-if="!isEditingNickname" class="font-sans sm:text-sm font-semibold text-white self-start overflow-hidden">
+                                {{ currentUser?.nickName }}
                             </span>
-                            <button class="text-white text-xs sm:text-sm hover:bg-slate-700 p-1 rounded">
-                                <i class="fas fa-pencil-alt"></i>
+                            <input
+                                v-else
+                                v-model="editedNickname"
+                                class=" px-1 py-0 font-sans sm:text-sm font-semibold text-white bg-black border border-white rounded"
+                                style="width: auto;"
+                              />
+                            <button @click="toggleEditedNickname" class="text-white text-xs sm:text-sm hover:bg-slate-700 p-1 rounded">
+                                <i v-if="!isEditingNickname" class="fas fa-pencil-alt"></i>
+                                <i v-else class="fas fa-save"></i>
                             </button>
                         </div>
 
@@ -32,11 +39,18 @@
                             <span class="font-sans text-xs sm:text-sm font-semibold text-white self-start">
                                 狀態  
                             </span>
-                            <span class="font-sans sm:text-sm font-semibold text-white self-start overflow-hidden">
+                            <span v-if="!isEditingStatus" class="font-sans sm:text-sm font-semibold text-white self-start overflow-hidden">
                                 {{ currentUser?.status }}
                             </span>
-                            <button class="text-white text-xs sm:text-sm hover:bg-slate-700 p-1 rounded">
-                                <i class="fas fa-pencil-alt"></i>
+                            <input
+                                v-else
+                                v-model="editedStatus"
+                                class=" px-1 py-0 font-sans sm:text-sm font-semibold text-white bg-black border border-white rounded"
+                                style="width: auto;"
+                              />
+                            <button @click="toggleEditStatus" class="text-white text-xs sm:text-sm hover:bg-slate-700 p-1 rounded">
+                                <i v-if="!isEditingStatus" class="fas fa-pencil-alt"></i>
+                                <i v-else class="fas fa-save"></i>
                             </button>
                         </div>
 
@@ -71,12 +85,65 @@ import type {
     Viewer 
 } from '@/common'
 
-defineProps({
+import {
+    ref,
+} from 'vue'
+
+const props = defineProps({
     currentUser: {
         type: Object as () => Viewer,
         required: true
     }
 })
+const isEditingStatus = ref(false);
+const editedStatus = ref("");
+
+const isEditingNickname = ref(false);
+const editedNickname = ref("");
+
+const toggleEditStatus = async () => {
+  if (isEditingStatus.value) {
+    await saveStatus();
+  } else {
+    editedStatus.value = props.currentUser?.status || "尚未設定狀態";
+    isEditingStatus.value = true;
+  }
+};
+const saveStatus = async () => {
+  try {
+    //const response = await axios.put("/user/update-status", {
+    //  status: editedStatus.value,
+    //});
+    //currentUser.value.status = editedStatus.value; // 更新 UI
+    isEditingStatus.value = false;
+
+    //console.log("Status updated:", response.data);
+  } catch (error) {
+    console.error("Error updating status:", error);
+  }
+};
+
+const toggleEditedNickname = async () => {
+  if (isEditingNickname.value) {
+    await saveNickname();
+  } else {
+    editedNickname.value = props.currentUser?.nickName || "尚未設定暱稱";
+    isEditingNickname.value = true;
+  }
+};
+const saveNickname = async () => {
+  try {
+    //const response = await axios.put("/user/update-nickname", {
+    //  status: editedNickname.value,
+    //});
+    //currentUser.value.nickname = editedNickname.value; // 更新 UI
+    isEditingNickname.value = false;
+
+    //console.log("Nickname updated:", response.data);
+  } catch (error) {
+    console.error("Error updating Nickname:", error);
+  }
+};
 
 
 // Services

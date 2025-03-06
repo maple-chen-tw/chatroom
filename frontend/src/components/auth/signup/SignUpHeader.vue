@@ -8,6 +8,6 @@
 
     <!-- Prompt -->
     <div class="mb-2 font-sans text-md text-gray-500 font-semibold text-center self-center">
-        Sign up to see photos and videos from your friends.
+        Sign up to chat with your friends.
     </div>
 </template>

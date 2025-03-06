@@ -139,7 +139,17 @@ onMounted(() => {
           }
         })
         .then(response => {
-          console.log("User info:", response.data);
+          //console.log("User info:", response.data);
+          user.value = {
+            id: response.data.user_id,
+            userName:response.data.username,
+            profilePictureUrl:response.data.avatar_url,
+            email:response.data.email,
+            status:response.data.status,
+            nickName:response.data.nickname,
+            dateJoined: response.data.created_at,
+            lastModifiedAt: response.data.updated_at,
+          }
         })
         .catch(error => {
           console.error("Error fetching user info:", error);
@@ -175,7 +185,8 @@ const invitationSampleA = new InvitationSample()
 const invitationSampleB = new InvitationSample()
 const invitationSampleC = new InvitationSample()
 
-const currentUser: Sender = sender
+//const currentUser: Sender = sender
+const currentUser: Sender = user
 
 // List of all conversations in the inbox
 const conversations = ref<Conversation[]>([

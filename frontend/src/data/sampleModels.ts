@@ -36,6 +36,7 @@ export class UserSample implements User {
     id = faker.string.uuid()
     //firstName = faker.person.firstName()
     //lastName = faker.person.lastName()
+    nickName = faker.internet.userName()
     userName = faker.internet.userName()
     profilePictureUrl = faker.image.avatar()
     email = faker.internet.email()

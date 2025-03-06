@@ -23,42 +23,6 @@
 			</p>
 		</div>
 
-		<!-- Input:First Name -->
-		<div class="mb-2">
-			<TheInput
-				v-model="signupForm.firstName" 
-				placeholder="First name" 
-				:class="{
-					'border-red-400': v$.firstName.$dirty && v$.firstName.$invalid 
-                }"
-				@blur="v$.firstName.$touch" />
-
-			<p
-				v-for="error of v$.firstName.$errors"
-				:key="error.$uid"
-				class="mt-2 text-xs text-red-600 dark:text-red-500">
-				{{ error.$message }}
-			</p>
-		</div>
-
-		<!-- Input:Last Name -->
-		<div class="mb-2">
-			<TheInput
-				v-model="signupForm.lastName" 
-				placeholder="Last name" 
-				:class="{
-					'border-red-400': v$.lastName.$dirty && v$.lastName.$invalid 
-				}"
-				@blur="v$.lastName.$touch" />
-
-			<p
-				v-for="error of v$.lastName.$errors"
-				:key="error.$uid"
-				class="mt-2 text-xs text-red-600 dark:text-red-500">
-				{{ error.$message }}
-			</p>
-		</div>
-
 		<!-- Input: Username -->
 		<div class="mb-2">
 			<TheInput
@@ -170,18 +134,6 @@ const validation = computed(() => ({
             email
         )
     },
-    firstName: {
-        required: helpers.withMessage(
-            'Please enter your first name',
-            required
-        )
-    },
-	lastName: {
-        required: helpers.withMessage(
-            'Please enter your last name',
-            required
-        )
-    },
     username: {
         required: helpers.withMessage(
             'Username is required',
@@ -212,7 +164,7 @@ const signup = () => {
         // Success toastr
         // TODO: Replace with actual signup logic
         toast.success('Success. Redirecting...')
-		router.push({ name: 'home' })
+		router.push({ name: 'direct' })
         isLoading.value = false
     }, 1000)
 }
