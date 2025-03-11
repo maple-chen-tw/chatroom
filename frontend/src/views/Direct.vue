@@ -41,6 +41,7 @@
             <ActiveInfo
                 v-if="activePanel === 'options'"
                 :current-user="currentUser"
+                @updateUser="updateUserData"
                 />
             <ActiveChat 
                 v-else-if="activeConversation"
@@ -156,7 +157,9 @@ onMounted(() => {
     }
 });
 
-
+const updateUserData = (updatedUser) => {
+  user.value = updatedUser; // 更新用戶資料
+};
 // References to DOM element
 const fileUpload = ref<HTMLInputElementRef | null>()
 

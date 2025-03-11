@@ -8,7 +8,7 @@
 
 				<div class="flex flex-col self-center space-y-2 pb-3">
 					<span class="font-sans text-xs sm:text-sm font-semibold text-white self-start">
-						{{ currentUser?.userName }}
+						{{ currentUser?.nickname }}
 					</span>
 					<div class="flex flex-row space-x-1">
 						<span class="font-sans text-xs font-semibold text-gray-400">
