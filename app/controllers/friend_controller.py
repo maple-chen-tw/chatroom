@@ -9,10 +9,8 @@ router = APIRouter(
     tags=["Friends"],
 )
 @router.get("/", response_model=list[dto.Friend])
-def get_friends(user_id: int, user: dependencies.user_dependency) -> list[db.User]:
-    if user.user_id != user_id:
-        raise HTTPException(status_code=403, detail="Forbidden")
-    friends = friend_service.get_friends(user_id)
+def get_friends(user: dependencies.user_dependency) -> list[db.User]:
+    friends = friend_service.get_friends(user.user_id)
     return friends
 
 @router.post("/request")
@@ -58,18 +56,14 @@ def reject_request(user_id: int, friend_id: int, user: dependencies.user_depende
     friend_service.reject_request(user_id, friend_id)
 
 @router.get("/search", response_model = dto.Friend)
-def get_search_by_username(user_id: int,username: str, user: dependencies.user_dependency)-> db.User | None:
-    if user is None:
-        raise HTTPException(status_code=404, detail="User not found")
-    if user.user_id != user_id:
-        raise HTTPException(status_code=403, detail="Forbidden")
+def get_search_by_username(username: str, user: dependencies.user_dependency)-> db.User | None:
 
     user = friend_service.get_search_by_username(username)
     if user is None:
         raise HTTPException(status_code=404, detail="User with username not found")
     
     return dto.Friend(
-        friend_id=user.user_id,
+        user_id=user.user_id,
         username=user.username,
         nickname=user.nickname, 
         avatar_url=user.avatar_url

@@ -83,8 +83,12 @@ export interface Conversation {
     isActive: boolean
 }
 
-
-
+export interface Friend {
+    user_id: number;
+    username: string;
+    nickname: string | null;
+    avatar_url: string | null;
+}
 /**
  * Represents an inbox containing chat threads.
  */

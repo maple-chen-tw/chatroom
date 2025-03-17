@@ -98,6 +98,7 @@ import type {
     HTMLInputElementRef,
     PhotoModalImage,
     Conversation,
+    Friend,
     Invitation
 } from '@/common'
 
@@ -116,16 +117,16 @@ import {
 import { 
 	useRouter 
 } from 'vue-router'
-
 import { onMounted } from 'vue';
 import axios from "axios";
-
 import { User } from '@/common'
-import jwt_decode from "jwt-decode";
+
 const router = useRouter()
 
 const token = localStorage.getItem('auth-token');
 const user = ref<User | null>(null);
+const conversations = ref<Conversation[]>([]);
+
 onMounted(() => {
     if (!token) {
         router.push('/accounts/login');
@@ -154,6 +155,42 @@ onMounted(() => {
         .catch(error => {
           console.error("Error fetching user info:", error);
         });
+
+        axios.get("/friends/", {
+            headers: {
+                "Authorization":`Bearer ${token}`
+            }
+        })
+        .then(response => {
+            const friends = response.data;
+            const newConversations: Conversation[] = [];
+
+            friends.forEach((friend: Friend) => {
+
+                const conversation: Conversation = {
+                    uuid: `conv-${friend.user_id}`, // 假設用朋友的 user_id 作為對話的唯一識別
+                    user: {
+                        id: friend.user_id,
+                        userName: friend.username,
+                        nickname: friend.nickname || null,
+                        profilePictureUrl: friend.avatar_url
+                    },
+                    lastMessage: 'No messages yet', // 這可以根據後端資料來決定
+                    timeSinceLastMessage: '0 mins ago', // 這可以根據後端資料來決定
+                    dialogs: [], // 這是對話的消息列表，根據後端資料來填充
+                    isActive: true // 假設所有的對話都是激活的
+                };
+
+                newConversations.push(conversation);
+            });
+
+            conversations.value = newConversations;
+        })
+        .catch(error => {
+            console.error("Error fetching friends list:", error);
+        });
+
+
     }
 });
 
@@ -183,27 +220,27 @@ const conversationSampleA = new ConversationSample()
 const conversationSampleB = new ConversationSample()
 const conversationSampleC = new ConversationSample()
 
-const invitationSampleA = new InvitationSample()
-const invitationSampleB = new InvitationSample()
-const invitationSampleC = new InvitationSample()
+// const invitationSampleA = new InvitationSample()
+// const invitationSampleB = new InvitationSample()
+// const invitationSampleC = new InvitationSample()
 
 //const currentUser: Sender = sender
 const currentUser: Sender = user
 
 // List of all conversations in the inbox
-const conversations = ref<Conversation[]>([
-    conversationSampleA,
-    conversationSampleB,
-    conversationSampleC
-])
+//const conversations = ref<Conversation[]>([
+//    conversationSampleA,
+//    conversationSampleB,
+//    conversationSampleC
+//])
 
 // List of all invitations in the inbox
-const invitations = ref<Invitation[]>([
-    invitationSampleA,
-    invitationSampleB,
-    invitationSampleC
-])
-console.log(invitations.value);
+//const invitations = ref<Invitation[]>([
+//    invitationSampleA,
+//    invitationSampleB,
+//    invitationSampleC
+//])
+//console.log(invitations.value);
 
 
 

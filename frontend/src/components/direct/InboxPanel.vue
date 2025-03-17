@@ -13,6 +13,7 @@
 			<!-- plus -->
             <InboxAddFriends
                 :invitations="invitations"
+                :conversations="conversations"
                 />
             </div>
             <div v-else-if="activePanel === 'user'">
