@@ -9,7 +9,6 @@
         class="flex-1 p-2 bg-black text-white rounded-lg focus:ring-2 focus:ring-white"
       />
       <button @click="searchFriend" class="ml-2 text-white">
-        <!-- 使用 Font Awesome 的搜尋圖標 -->
         <i class="fas fa-search"></i>
       </button>
     </div>
@@ -66,12 +65,26 @@
 
 <script setup lang="ts">
 import type {
-  Invitation
+  Invitation,
+  Conversation
 } from '@/common/models'
+import axios from 'axios'
 import { ref } from 'vue'
+import jwt_decode from 'jwt-decode';
+
+import { 
+	useRouter 
+} from 'vue-router'
 
 defineProps({
-  
+  conversations: {
+        type: Object as() => Conversation[] | undefined,
+        required: true
+    },
+    activeConversationId: {
+        type: String as() => Conversation['uuid'] | undefined,
+        default: undefined
+    },
   invitations: {
         type: Object as() => Invitation[] | undefined,
         required: true
@@ -82,7 +95,20 @@ defineProps({
     }
 })
 
+const router = useRouter()
 const searchQuery = ref('')
+const token = localStorage.getItem('auth-token');
+if (!token) {
+  console.log("No auth token found, redirecting to login...");
+  router.push('/auth/login');
+}
+interface DecodedToken {
+  user_id: string;
+}
+if (token) {
+  const decodedToken = jwt_decode<DecodedToken>(token); 
+  const userId = decodedToken.user_id;
+}
 
 const searchFriend = () => {
   if (!searchQuery.value.trim()) {
@@ -90,11 +116,52 @@ const searchFriend = () => {
     return
   }
   console.log(`Searching for: ${searchQuery.value}`)
-  // 在這裡可以添加處理搜尋邏輯的程式碼
-  // 比如過濾邀請資料
-  // 例如篩選出符合搜尋關鍵字的邀請:
-  // const filteredInvitations = invitations.filter(invit => invit.user.userName.includes(searchQuery.value))
-  // console.log(filteredInvitations)
+
+  axios.get('friends/search', {
+    headers: {
+                "Authorization":`Bearer ${token}`
+            },
+    params: {
+      username:searchQuery.value
+    }
+  })
+  .then(response => {
+    const friend = response.data;
+    if (friend) {
+      console.log('Found friend:', friend);
+    }
+
+    // 1. 如果搜尋結果是自己，顯示提示
+    //if (friend.user_id === userId) {
+    //  console.log('You cannot search for yourself.');
+    //  return;
+    //}
+
+    // 2. 檢查該朋友是否已經在好友列表中
+    // 假設你有一個 `friends` 陣列，包含當前用戶的所有好友
+
+    //const isAlreadyFriend = conversations.some(f => f.user_id === friend.user_id);
+    //if (isAlreadyFriend) {
+    //  console.log('You are already friends with this user.');
+    //  return;
+    //}
+
+    // 3. 如果不是好友，發送好友邀請
+    sendFriendRequest(friend.user_id);
+
+  })
+  .catch(error => {
+    if (error.response && error.response.status == 404) {
+      console.log('User with username not found');
+    } else {
+      console.error('Error searching for user:', error);
+    }
+
+  });
+}
+
+const sendFriendRequest = (friendId: number) => {
+
 }
 /**
  * Accept friend request
