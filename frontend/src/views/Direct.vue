@@ -163,6 +163,9 @@ onMounted(() => {
         })
         .then(response => {
             const friends = response.data;
+            if (friends.length === 0) {
+                console.log("No friends found.");
+            }
             const newConversations: Conversation[] = [];
 
             friends.forEach((friend: Friend) => {

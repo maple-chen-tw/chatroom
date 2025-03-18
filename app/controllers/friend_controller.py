@@ -11,6 +11,8 @@ router = APIRouter(
 @router.get("/", response_model=list[dto.Friend])
 def get_friends(user: dependencies.user_dependency) -> list[db.User]:
     friends = friend_service.get_friends(user.user_id)
+    if not friends:
+        return []
     return friends
 
 @router.post("/request")

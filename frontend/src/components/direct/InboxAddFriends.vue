@@ -66,7 +66,8 @@
 <script setup lang="ts">
 import type {
   Invitation,
-  Conversation
+  Conversation,
+  Friend
 } from '@/common/models'
 import axios from 'axios'
 import { ref } from 'vue'
@@ -76,7 +77,7 @@ import {
 	useRouter 
 } from 'vue-router'
 
-defineProps({
+const props = defineProps({
   conversations: {
         type: Object as() => Conversation[] | undefined,
         required: true
@@ -102,12 +103,17 @@ if (!token) {
   console.log("No auth token found, redirecting to login...");
   router.push('/auth/login');
 }
-interface DecodedToken {
-  user_id: string;
-}
+
+const userId = ref<string | null>(null);
+
+
 if (token) {
-  const decodedToken = jwt_decode<DecodedToken>(token); 
-  const userId = decodedToken.user_id;
+  try {
+    const decodedToken = jwt_decode<{ user_id: string }>(token); 
+    userId.value = decodedToken.user_id;
+  } catch (error) {
+    console.error("Error decoding token:", error);
+  }
 }
 
 const searchFriend = () => {
@@ -126,28 +132,27 @@ const searchFriend = () => {
     }
   })
   .then(response => {
-    const friend = response.data;
+    const friend: Friend = response.data;
     if (friend) {
       console.log('Found friend:', friend);
     }
 
     // 1. 如果搜尋結果是自己，顯示提示
-    //if (friend.user_id === userId) {
-    //  console.log('You cannot search for yourself.');
-    //  return;
-    //}
+    if (friend.user_id === userId.value) {
+      console.log('You cannot search for yourself.');
+      return;
+    }
 
     // 2. 檢查該朋友是否已經在好友列表中
-    // 假設你有一個 `friends` 陣列，包含當前用戶的所有好友
-
-    //const isAlreadyFriend = conversations.some(f => f.user_id === friend.user_id);
-    //if (isAlreadyFriend) {
-    //  console.log('You are already friends with this user.');
-    //  return;
-    //}
-
-    // 3. 如果不是好友，發送好友邀請
-    sendFriendRequest(friend.user_id);
+    const isAlreadyFriend = props.conversations?.some(f => f.user_id === friend.user_id);
+    if (isAlreadyFriend) {
+      console.log('You are already friends with this user.');
+      return;
+    }
+    // 3. 如果已經發送過好友邀請，顯示已經發送過
+    
+    // 4. 如果不是好友，發送好友邀請
+    sendFriendRequest(friend);
 
   })
   .catch(error => {
@@ -159,10 +164,13 @@ const searchFriend = () => {
 
   });
 }
-
-const sendFriendRequest = (friendId: number) => {
-
+/**
+ * Send friend request
+ */
+const sendFriendRequest = (friend: Friend) => {
+  console.log(`Friend request sent to ${friend.username}`)
 }
+
 /**
  * Accept friend request
  */
