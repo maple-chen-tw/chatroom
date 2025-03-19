@@ -16,46 +16,39 @@ def get_friends(user: dependencies.user_dependency) -> list[db.User]:
     return friends
 
 @router.post("/request")
-def sent_request(user_id: int, friend_id: int, user: dependencies.user_dependency) -> None:
-    if user.user_id != user_id:
-        raise HTTPException(status_code=403, detail="Forbidden")
-    
-    if user_id == friend_id:
+def sent_request(friend_id: int, user: dependencies.user_dependency) -> None:
+
+    if user.user_id == friend_id:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="You cannot add yourself as a friend."
         )
-    friend_service.sent_request(user_id, friend_id)
+    friend_service.sent_request(user.user_id, friend_id)
 
 
 # get pending requests
 @router.get("/requests/pending", response_model=list[dto.Friend])
-def get_received_requests(user_id: int, user: dependencies.user_dependency)-> db.User:
-    if user.user_id != user_id:
-        raise HTTPException(status_code=403, detail="Forbidden")
-
-    pending_friend_requests = friend_service.get_received_requests(user_id)
+def get_received_requests(user: dependencies.user_dependency)-> db.User:
+    pending_friend_requests = friend_service.get_received_requests(user.user_id)
+    if not pending_friend_requests:
+        return []
     return pending_friend_requests 
 
 # get sent requests
 @router.get("/requests/sent", response_model=list[dto.Friend])
-def get_sent_requests(user_id: int, user: dependencies.user_dependency) -> db.User:
-    if user.user_id != user_id:
-        raise HTTPException(status_code=403, detail="Forbidden")
-    sent_requests = friend_service.get_sent_requests(user_id)
+def get_sent_requests(user: dependencies.user_dependency) -> db.User:
+    sent_requests = friend_service.get_sent_requests(user.user_id)
+    if not sent_requests:
+        return []
     return sent_requests
 
 @router.post("/requests/accepted")
-def accept_request(user_id: int, friend_id: int, user: dependencies.user_dependency) -> None:
-    if user.user_id != user_id:
-        raise HTTPException(status_code=403, detail="Forbidden")
-    friend_service.accept_request(user_id, friend_id)
+def accept_request(friend_id: int, user: dependencies.user_dependency) -> None:
+    friend_service.accept_request(user.user_id, friend_id)
 
 @router.delete("/requests/reject", status_code=204)
-def reject_request(user_id: int, friend_id: int, user: dependencies.user_dependency) -> None:
-    if user.user_id != user_id:
-        raise HTTPException(status_code=403, detail="Forbidden")
-    friend_service.reject_request(user_id, friend_id)
+def reject_request(friend_id: int, user: dependencies.user_dependency) -> None:
+    friend_service.reject_request(user.user_id, friend_id)
 
 @router.get("/search", response_model = dto.Friend)
 def get_search_by_username(username: str, user: dependencies.user_dependency)-> db.User | None:
@@ -72,8 +65,6 @@ def get_search_by_username(username: str, user: dependencies.user_dependency)-> 
     )
 
 @router.delete("/", status_code=204)
-def delete_friend(user_id: int, friend_id: int, user: dependencies.user_dependency) -> None:
-    if user.user_id != user_id:
-        raise HTTPException(status_code=403, detail="Forbidden")
-    friend_service.delete_friend(user_id, friend_id)
+def delete_friend(friend_id: int, user: dependencies.user_dependency) -> None:
+    friend_service.delete_friend(user.user_id, friend_id)
     

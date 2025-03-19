@@ -123,77 +123,117 @@ import { User } from '@/common'
 
 const router = useRouter()
 
-const token = localStorage.getItem('auth-token');
+const token: string | null = localStorage.getItem('auth-token');
 const user = ref<User | null>(null);
 const conversations = ref<Conversation[]>([]);
+const invitations = ref<Invitation[]>([]);
 
-onMounted(() => {
-    if (!token) {
-        router.push('/accounts/login');
-    }
-
-    if (token) {
-        //const decodedToken = jwt_decode(token);
-        //const userId = decodedToken.user_id;
-        axios.get("/user/me", {
-          headers: {
-            "Authorization": `Bearer ${token}`
-          }
-        })
-        .then(response => {
-          user.value = {
+const fetchUserInfo = async (token: string) => {
+    try {
+        const response = await axios.get("/user/me", {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+        return {
             id: response.data.user_id,
-            userName:response.data.username,
-            profilePictureUrl:response.data.avatar_url,
-            email:response.data.email,
-            status:response.data.status,
-            nickname:response.data.nickname,
+            userName: response.data.username,
+            profilePictureUrl: response.data.avatar_url,
+            email: response.data.email,
+            status: response.data.status,
+            nickname: response.data.nickname,
             dateJoined: response.data.created_at,
             lastModifiedAt: response.data.updated_at,
-          }
-        })
-        .catch(error => {
-          console.error("Error fetching user info:", error);
-        });
+        };
+    } catch (error) {
+        console.error("Error fetching user info:", error);
+        throw error;
+    }
+};
 
-        axios.get("/friends/", {
+const fetchFriendsList = async (token: string) => {
+    try {
+        const response = await axios.get("/friends/", {
             headers: {
-                "Authorization":`Bearer ${token}`
+                "Authorization": `Bearer ${token}`
             }
-        })
-        .then(response => {
-            const friends = response.data;
-            if (friends.length === 0) {
-                console.log("No friends found.");
-            }
-            const newConversations: Conversation[] = [];
-
-            friends.forEach((friend: Friend) => {
-
-                const conversation: Conversation = {
-                    uuid: `conv-${friend.user_id}`, // 假設用朋友的 user_id 作為對話的唯一識別
-                    user: {
-                        id: friend.user_id,
-                        userName: friend.username,
-                        nickname: friend.nickname || null,
-                        profilePictureUrl: friend.avatar_url
-                    },
-                    lastMessage: 'No messages yet', // 這可以根據後端資料來決定
-                    timeSinceLastMessage: '0 mins ago', // 這可以根據後端資料來決定
-                    dialogs: [], // 這是對話的消息列表，根據後端資料來填充
-                    isActive: true // 假設所有的對話都是激活的
-                };
-
-                newConversations.push(conversation);
-            });
-
-            conversations.value = newConversations;
-        })
-        .catch(error => {
-            console.error("Error fetching friends list:", error);
         });
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching friends list:", error);
+        throw error;
+    }
+};
 
+const createConversations = (friends: Friend[]) => {
+    const newConversations = friends.map(friend => {
+        return {
+            uuid: `conv-${friend.user_id}`,
+            user: {
+                id: friend.user_id,
+                userName: friend.username,
+                nickname: friend.nickname || null,
+                profilePictureUrl: friend.avatar_url
+            },
+            lastMessage: 'No messages yet',
+            timeSinceLastMessage: '0 mins ago',
+            dialogs: [],
+            isActive: true
+        };
+    });
+    return newConversations;
+};
 
+const fetchInvitationList = async (token: string) => {
+    try {
+        const response = await axios.get("/friends/requests/pending", {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching invitation list:", error);
+        throw error;
+    }
+}
+
+const createInvitations = (friends: Friend[]) => {
+    const newInvitations = friends.map(friend => {
+        return {
+            uuid: `invi-${friend.user_id}`,
+            user: {
+                id: friend.user_id,
+                userName: friend.username,
+                nickname: friend.nickname || null,
+                profilePictureUrl: friend.avatar_url
+            },
+            status: 'pending'
+        };
+    });
+    return newInvitations;
+
+};
+
+onMounted(async () => {
+    const router = useRouter();
+
+    if (!token) {
+        router.push('/accounts/login');
+        return;
+    }
+
+    try {
+
+        user.value = await fetchUserInfo(token);
+        const friends = await fetchFriendsList(token);
+        conversations.value = createConversations(friends);
+        const invits = await fetchInvitationList(token);
+        invitations.value = createInvitations(invits);
+        
+
+    } catch (error) {
+        console.error("Error in onMounted:", error);
     }
 });
 
@@ -219,9 +259,9 @@ const activeConversation = ref<Conversation | undefined>(undefined)
 const viewer = new UserSample()
 const sender = new UserSample()
 
-const conversationSampleA = new ConversationSample()
-const conversationSampleB = new ConversationSample()
-const conversationSampleC = new ConversationSample()
+// const conversationSampleA = new ConversationSample()
+// const conversationSampleB = new ConversationSample()
+// const conversationSampleC = new ConversationSample()
 
 // const invitationSampleA = new InvitationSample()
 // const invitationSampleB = new InvitationSample()

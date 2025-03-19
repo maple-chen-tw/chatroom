@@ -123,10 +123,9 @@ export interface Sender extends User {
 export interface Invitation {
     /** Unique identifier for the Invitation */
     uuid: string
+    //
+    user: User
 
-    /** User who initiated the Invitation */
-    user: Sender
+    status: 'pending' | 'accepted' | 'rejected' | 'deleted';
 
-    /** Indicates if the Invitation is currently accepted */
-    isAccepted: boolean
 }

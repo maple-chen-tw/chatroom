@@ -150,7 +150,11 @@ const searchFriend = () => {
       return;
     }
     // 3. 如果已經發送過好友邀請，顯示已經發送過
-    
+    const isRequestAlreadySent = checkIfRequestSent(friend.user_id);
+    if (isRequestAlreadySent) {
+      console.log('Friend request has already been sent.');
+      return;
+    }
     // 4. 如果不是好友，發送好友邀請
     sendFriendRequest(friend);
 
@@ -164,6 +168,12 @@ const searchFriend = () => {
 
   });
 }
+
+const checkIfRequestSent = (friend: Friend) => {
+  console.log(`Friend request is already sent.`)
+  return 1;
+}
+
 /**
  * Send friend request
  */
