@@ -70,6 +70,7 @@ import type {
   Friend
 } from '@/common/models'
 import axios from 'axios'
+import { AxiosError } from 'axios';
 import { ref } from 'vue'
 import jwt_decode from 'jwt-decode';
 
@@ -131,7 +132,7 @@ const searchFriend = () => {
       username:searchQuery.value
     }
   })
-  .then(response => {
+  .then(async response => {
     const friend: Friend = response.data;
     if (friend) {
       console.log('Found friend:', friend);
@@ -144,19 +145,21 @@ const searchFriend = () => {
     }
 
     // 2. 檢查該朋友是否已經在好友列表中
-    const isAlreadyFriend = props.conversations?.some(f => f.user_id === friend.user_id);
+    const isAlreadyFriend = props.conversations?.some(f => {
+      return f.user.id === friend.user_id;
+    });
     if (isAlreadyFriend) {
       console.log('You are already friends with this user.');
       return;
     }
     // 3. 如果已經發送過好友邀請，顯示已經發送過
-    const isRequestAlreadySent = checkIfRequestSent(friend.user_id);
+    const isRequestAlreadySent = await checkIfRequestSent(friend);
     if (isRequestAlreadySent) {
       console.log('Friend request has already been sent.');
       return;
     }
     // 4. 如果不是好友，發送好友邀請
-    sendFriendRequest(friend);
+    await sendFriendRequest(friend);
 
   })
   .catch(error => {
@@ -169,17 +172,59 @@ const searchFriend = () => {
   });
 }
 
-const checkIfRequestSent = (friend: Friend) => {
-  console.log(`Friend request is already sent.`)
-  return 1;
+const checkIfRequestSent = async(friend: Friend) => {
+  try {
+
+    const response = await axios.get('friends/requests/sent');
+    
+    const sentRequests: Friend[] = response.data;
+    
+    const isRequestSent = sentRequests.some((sentFriend) => sentFriend.user_id === friend.user_id);
+    
+    return isRequestSent
+  } catch (error) {
+    console.error('Error fetching sent requests:', error);
+    return 0;
+  }
 }
 
 /**
  * Send friend request
  */
-const sendFriendRequest = (friend: Friend) => {
-  console.log(`Friend request sent to ${friend.username}`)
-}
+const sendFriendRequest = async (friend: Friend) => {
+ // Log the action for debugging purposes
+ console.log(`Sending friend request to ${friend.username}...`);
+
+ try {
+   // Make a POST request to the API to send a friend request
+   const response = await axios.post('/friends/request', null, {
+     headers: {
+       "Authorization": `Bearer ${token}`,
+     },
+     params: {
+       friend_id: friend.user_id,
+     },
+   });
+
+   console.log(`Friend request sent to ${friend.username}`);
+ } catch (error: unknown) {
+    if (error instanceof AxiosError) {
+
+      if (error.response) {
+        if (error.response.status === 400) {
+          console.error('Error sending friend request:', error.response.data.detail);
+        } else {
+          console.error('Error sending friend request:', error.response.data);
+        }
+      } else {
+        console.error('No response received:', error.message);
+      }
+    } else {
+      console.error('Unexpected error occurred:', error);
+    }
+  }
+ }
+
 
 /**
  * Accept friend request

@@ -17,7 +17,7 @@
 
                 <InboxPanel
                   v-else-if="activePanel === 'plus'"
-                  :conversations=undefined
+                  :conversations=conversations
                   :invitations="invitations"
                   :active-panel="activePanel"
                   :activeConversation=undefined

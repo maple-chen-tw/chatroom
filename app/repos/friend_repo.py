@@ -1,6 +1,7 @@
 from app.models.db import Friend, User
 from sqlalchemy import and_, or_
 from app.db.context import session_maker
+from fastapi import HTTPException, status
 def get_friends(user_id: int) -> list[User]:
     with session_maker() as session:
         result = session.query(
@@ -60,9 +61,15 @@ def sent_request(user_id: int, friend_id: int) -> None:
 
         if existing_friendship:
             if existing_friendship.status == "accepted":
-                raise ValueError("Already friends")
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Already friends"
+                )
             elif existing_friendship.status == "pending":
-                raise ValueError("Friend request already sent")
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="Friend request already sent"
+                )
 
         relationship = Friend()
         relationship.user_id = user_id
