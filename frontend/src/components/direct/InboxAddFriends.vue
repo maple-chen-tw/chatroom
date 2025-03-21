@@ -13,6 +13,9 @@
       </button>
     </div>
   </div>
+  <div v-if="searchMessage" class="pl-2 pr-2 text-yellow-400 font-bold">
+  {{ searchMessage }}
+  </div>
 
   <div class="flex flex-col pl-2 pr-2 text-white font-bold">
     待確認好友邀請
@@ -97,8 +100,10 @@ const props = defineProps({
     }
 })
 
+
 const router = useRouter()
 const searchQuery = ref('')
+const searchMessage = ref('');
 const token = localStorage.getItem('auth-token');
 if (!token) {
   console.log("No auth token found, redirecting to login...");
@@ -120,9 +125,11 @@ if (token) {
 const searchFriend = () => {
   if (!searchQuery.value.trim()) {
     console.log('Please enter a search term.')
+    searchMessage.value = '請輸入有效的 Email 或 username 來搜尋好友';
     return
   }
-  console.log(`Searching for: ${searchQuery.value}`)
+
+  searchMessage.value = `正在搜尋: ${searchQuery.value}...`;
 
   axios.get('friends/search', {
     headers: {
@@ -141,6 +148,7 @@ const searchFriend = () => {
     // 1. 如果搜尋結果是自己，顯示提示
     if (friend.user_id === userId.value) {
       console.log('You cannot search for yourself.');
+      searchMessage.value = '你不能搜尋自己!';
       return;
     }
 
@@ -150,23 +158,28 @@ const searchFriend = () => {
     });
     if (isAlreadyFriend) {
       console.log('You are already friends with this user.');
+      searchMessage.value = '該使用者已經是您的好友!';
       return;
     }
     // 3. 如果已經發送過好友邀請，顯示已經發送過
     const isRequestAlreadySent = await checkIfRequestSent(friend);
     if (isRequestAlreadySent) {
       console.log('Friend request has already been sent.');
+      searchMessage.value = '好友邀請已經發送過了!';
       return;
     }
     // 4. 如果不是好友，發送好友邀請
     await sendFriendRequest(friend);
+    searchMessage.value = `已發送好友邀請給 ${friend.username}！`;
 
   })
   .catch(error => {
     if (error.response && error.response.status == 404) {
       console.log('User with username not found');
+      searchMessage.value = '找不到該使用者!';
     } else {
       console.error('Error searching for user:', error);
+      searchMessage.value = '搜尋時發生錯誤，請稍後再試!';
     }
 
   });
@@ -175,7 +188,11 @@ const searchFriend = () => {
 const checkIfRequestSent = async(friend: Friend) => {
   try {
 
-    const response = await axios.get('friends/requests/sent');
+    const response = await axios.get('friends/requests/sent',{
+      headers: {
+       "Authorization": `Bearer ${token}`,
+     },
+    });
     
     const sentRequests: Friend[] = response.data;
     
