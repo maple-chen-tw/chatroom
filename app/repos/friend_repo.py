@@ -128,16 +128,8 @@ def reject_request(user_id: int, friend_id: int) -> None:
     with session_maker.begin() as session:
         session.query(Friend).filter(
             Friend.status == "pending",
-            or_(
-                and_(
-                    Friend.user_id == user_id,
-                    Friend.friend_id == friend_id
-                ),
-                and_(
-                    Friend.user_id == friend_id,
-                    Friend.friend_id == user_id
-                )
-            )
+            Friend.user_id == friend_id,
+            Friend.friend_id == user_id,
         ).delete(synchronize_session=False)
 '''
 def delete_friend(user_id: int, friend_id: int) -> None:

@@ -14,6 +14,7 @@
             <InboxAddFriends
                 :invitations="invitations"
                 :conversations="conversations"
+                @update-invitations="updateInvitations"
                 />
             </div>
             <div v-else-if="activePanel === 'user'">
@@ -53,7 +54,7 @@ import type {
     Viewer
 } from '@/common'
 
-defineProps({
+const props = defineProps({
     conversations: {
         type: Array as() => Conversation[] | undefined,
         required: false
@@ -76,5 +77,9 @@ defineProps({
     }
 })
 
-const emit = defineEmits(['onSelectConversation'])
+const emit = defineEmits(['onSelectConversation', 'update-invitations'])
+const updateInvitations = (newInvitations: Invitation[]) => {
+    emit('update-invitations', newInvitations)
+}
+
 </script>

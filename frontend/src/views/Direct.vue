@@ -22,6 +22,7 @@
                   :active-panel="activePanel"
                   :activeConversation=undefined
                   :current-user="currentUser"
+                  @update-invitations="updateInvitations"
                 />
               
                 <InboxPanel
@@ -240,6 +241,10 @@ onMounted(async () => {
 const updateUserData = (updatedUser) => {
   user.value = updatedUser; // 更新用戶資料
 };
+
+const updateInvitations = (newInvitations: Invitation[]) => {
+  invitations.value = newInvitations
+}
 // References to DOM element
 const fileUpload = ref<HTMLInputElementRef | null>()
 
@@ -369,6 +374,8 @@ const onFileUpload = async (event: Event) => {
         }
     }
 }
+
+
 
 /**
  * Select conversation from inbox list
