@@ -101,7 +101,7 @@ const props = defineProps({
 })
 
 
-const emit = defineEmits(['update-invitations'])
+const emit = defineEmits(['update-invitations', 'update-conversations'])
 
 const router = useRouter()
 const searchQuery = ref('')
@@ -254,22 +254,32 @@ const sendFriendRequest = async (friend: Friend) => {
         friend_id: invit.user.id, // 發送的好友 ID
       },
     })
+    if (response.status === 200) {
 
-    console.log(`Successfully accepted the friend request for ${invit.user.userName}`)
-    
-    // 從邀請列表中移除該請求
-    if (props.invitations && Array.isArray(props.invitations)) {
-      const updatedInvitations = props.invitations.filter(inv => inv.uuid !== invit.uuid)
-      emit('update-invitations', updatedInvitations)
+      // Update conversations list by adding the accepted user
+      if (Array.isArray(props.conversations)) {
+        const updatedConversations = [...props.conversations, { user: invit.user }];
+        emit('update-conversations', updatedConversations);
+      }
+
+      // Remove the accepted invitation from the invitations list
+      if (Array.isArray(props.invitations)) {
+        const updatedInvitations = props.invitations.filter(inv => inv.uuid !== invit.uuid);
+        emit('update-invitations', updatedInvitations);
+      }
+
+      console.log(`Successfully accepted the friend request for ${invit.user.userName}`);
+    } else {
+      console.error("Failed to accept the friend request", response.data);
     }
   } catch (error) {
     if (error instanceof AxiosError) {
-      console.error('Error accepting friend request:', error.response?.data || error.message)
+      console.error('Error accepting friend request:', error.response?.data || error.message);
     } else {
-      console.error('Unexpected error occurred:', error)
+      console.error('Unexpected error occurred:', error);
     }
   }
-}
+};
 
 /**
  * Reject friend request
@@ -278,20 +288,18 @@ const sendFriendRequest = async (friend: Friend) => {
   console.log(`Friend request rejected for ${invit.user.userName}`)
 
   try {
-    const response = await axios.delete('/requests/reject', {
+    const response = await axios.delete('friends/requests/reject', {
       headers: {
         "Authorization": `Bearer ${token}`,
       },
       params: {
-        friend_id: invit.user.id, // 發送的好友 ID
+        friend_id: invit.user.id,
       },
     })
 
-    console.log(`Successfully rejected the friend request for ${invit.user.userName}`)
-    
     // 從邀請列表中移除該請求
     if (props.invitations && Array.isArray(props.invitations)) {
-      const updatedInvitations = props.invitations.filter(inv => inv.uuid !== invit.uuid)
+      const updatedInvitations = [...props.invitations.filter(inv => inv.uuid !== invit.uuid)];
       emit('update-invitations', updatedInvitations)
     }
 

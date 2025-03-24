@@ -14,7 +14,8 @@
             <InboxAddFriends
                 :invitations="invitations"
                 :conversations="conversations"
-                @update-invitations="updateInvitations"
+                @update-invitations="updatedInvitations"
+                @update-conversations="updatedConverations"
                 />
             </div>
             <div v-else-if="activePanel === 'user'">
@@ -77,9 +78,13 @@ const props = defineProps({
     }
 })
 
-const emit = defineEmits(['onSelectConversation', 'update-invitations'])
-const updateInvitations = (newInvitations: Invitation[]) => {
+const emit = defineEmits(['onSelectConversation', 'update-invitations', 'update-conversations'])
+const updatedInvitations = (newInvitations: Invitation[]) => {
     emit('update-invitations', newInvitations)
+}
+
+const updatedConverations = (newConversations: Conversation[]) => {
+    emit('update-conversations', newConversations)
 }
 
 </script>

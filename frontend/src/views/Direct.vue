@@ -8,9 +8,9 @@
                 <InboxPanel
                   v-if="activePanel === 'user'"
                   :conversations="conversations"
-                  :invitations=undefined
+                  :invitations=null
                   :active-panel="activePanel"
-                  :activeConversation=undefined
+                  :activeConversation=null
                   :current-user="currentUser"
                   @on-select-conversation="selectConversation"
                 />
@@ -20,17 +20,18 @@
                   :conversations=conversations
                   :invitations="invitations"
                   :active-panel="activePanel"
-                  :activeConversation=undefined
+                  :activeConversation=null
                   :current-user="currentUser"
-                  @update-invitations="updateInvitations"
+                  @update-invitations="updatedInvitations"
+                  @update-conversations="updatedConverations"
                 />
               
                 <InboxPanel
                   v-else
                   :conversations="conversations"
-                  :invitations=undefined
+                  :invitations=null
                   :active-panel="activePanel"
-                  :activeConversation=undefined
+                  :activeConversation=null
                   :current-user="currentUser"
                   @on-select-conversation="selectConversation"
                 />
@@ -242,9 +243,14 @@ const updateUserData = (updatedUser) => {
   user.value = updatedUser; // 更新用戶資料
 };
 
-const updateInvitations = (newInvitations: Invitation[]) => {
+const updatedConverations = (newConversations: Conversation[]) => {
+  conversations.value = newConversations
+}
+
+const updatedInvitations = (newInvitations: Invitation[]) => {
   invitations.value = newInvitations
 }
+
 // References to DOM element
 const fileUpload = ref<HTMLInputElementRef | null>()
 
@@ -261,8 +267,8 @@ const isChatLoading = ref<boolean>(false)
 const activeConversation = ref<Conversation | undefined>(undefined)
 
 // Sample data
-const viewer = new UserSample()
-const sender = new UserSample()
+//const viewer = new UserSample()
+//const sender = new UserSample()
 
 // const conversationSampleA = new ConversationSample()
 // const conversationSampleB = new ConversationSample()
@@ -273,7 +279,7 @@ const sender = new UserSample()
 // const invitationSampleC = new InvitationSample()
 
 //const currentUser: Sender = sender
-const currentUser: Sender = user
+const currentUser: User = user
 
 // List of all conversations in the inbox
 //const conversations = ref<Conversation[]>([

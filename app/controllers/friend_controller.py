@@ -23,7 +23,13 @@ def sent_request(friend_id: int, user: dependencies.user_dependency) -> None:
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="You cannot add yourself as a friend."
         )
-    friend_service.sent_request(user.user_id, friend_id)
+    try:
+        friend_service.sent_request(user.user_id, friend_id)
+    except ValueError as e:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=str(e)
+        )
 
 
 # get pending requests
