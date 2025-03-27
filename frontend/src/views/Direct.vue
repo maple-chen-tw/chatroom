@@ -119,9 +119,30 @@ import {
 import { 
 	useRouter 
 } from 'vue-router'
-import { onMounted } from 'vue';
+import { onMounted, onUnmounted } from 'vue';
 import axios from "axios";
 import { User } from '@/common'
+
+import io from 'socket.io-client'
+const socket = io("http://localhost:8000", {
+    path: "/ws/socket.io/",
+    transports: ['websocket'],
+    autoConnect: true,
+    reconnection: true,
+    reconnectionAttempts: 5,
+    reconnectionDelay: 1000,
+});
+socket.on('connect', () => {
+    console.log("✅ Connected to WebSocket server");
+});
+socket.on('connect_error', (err) => {
+    console.error("❌ WebSocket connection error:", err);
+});
+
+// ✅ 重新連線成功
+socket.on('reconnect', (attempt) => {
+    console.log(`🔄 WebSocket reconnected (attempt ${attempt})`);
+});
 
 const router = useRouter()
 
@@ -129,6 +150,7 @@ const token: string | null = localStorage.getItem('auth-token');
 const user = ref<User | null>(null);
 const conversations = ref<Conversation[]>([]);
 const invitations = ref<Invitation[]>([]);
+const activeConversation = ref<Conversation | undefined>(undefined)
 
 const fetchUserInfo = async (token: string) => {
     try {
@@ -167,10 +189,11 @@ const fetchFriendsList = async (token: string) => {
     }
 };
 
-const createConversations = (friends: Friend[]) => {
-    const newConversations = friends.map(friend => {
+const createConversations = (friends: Friend[], user_id: string) => {
+    return friends.map(friend => {
+        const roomId = [user_id, friend.user_id].sort().join('-');
         return {
-            uuid: `conv-${friend.user_id}`,
+            uuid: `room-${roomId}`,
             user: {
                 id: friend.user_id,
                 userName: friend.username,
@@ -183,8 +206,8 @@ const createConversations = (friends: Friend[]) => {
             isActive: true
         };
     });
-    return newConversations;
 };
+
 
 const fetchInvitationList = async (token: string) => {
     try {
@@ -218,6 +241,23 @@ const createInvitations = (friends: Friend[]) => {
 };
 
 onMounted(async () => {
+    
+    // ✅ 伺服器傳來的訊息
+
+    socket.on("receive_message", (messageData: ChatDialog) => {
+
+    if (activeConversation.value && activeConversation.value.uuid) {
+            console.log("Adding message to active conversation");
+
+            const isSentByViewer = messageData.user?.id === currentUser.value?.id;
+            messageData.isSentByViewer = isSentByViewer;
+
+            if (!activeConversation.value.dialogs.some((dialog: ChatDialog) => dialog.text === messageData.text && dialog.timestamp === messageData.timestamp)) {
+            activeConversation.value.dialogs.push(messageData);
+        }
+      }
+    });
+
     const router = useRouter();
 
     if (!token) {
@@ -229,7 +269,7 @@ onMounted(async () => {
 
         user.value = await fetchUserInfo(token);
         const friends = await fetchFriendsList(token);
-        conversations.value = createConversations(friends);
+        conversations.value = createConversations(friends, user.value?.id);
         const invits = await fetchInvitationList(token);
         invitations.value = createInvitations(invits);
         
@@ -237,7 +277,14 @@ onMounted(async () => {
     } catch (error) {
         console.error("Error in onMounted:", error);
     }
+
+
 });
+
+onUnmounted(() => {
+    socket.off("receive_message");
+});
+
 
 const updateUserData = (updatedUser) => {
   user.value = updatedUser; // 更新用戶資料
@@ -263,8 +310,6 @@ const isFileUploaded = ref<boolean>(false)
 const isFileValid = ref<boolean>(false)
 const isChatLoading = ref<boolean>(false)
 
-// Others
-const activeConversation = ref<Conversation | undefined>(undefined)
 
 // Sample data
 //const viewer = new UserSample()
@@ -279,7 +324,7 @@ const activeConversation = ref<Conversation | undefined>(undefined)
 // const invitationSampleC = new InvitationSample()
 
 //const currentUser: Sender = sender
-const currentUser: User = user
+const currentUser: Sender = user
 
 // List of all conversations in the inbox
 //const conversations = ref<Conversation[]>([
@@ -314,9 +359,6 @@ const changePanel = (panel: string) => {
   activePanel.value = panel
   activeConversation.value = undefined
 }
-watch(activePanel, (newValue) => {
-  console.log("activePanel changed:", newValue);
-});
 
 // Services
 const toast = useToast()
@@ -327,14 +369,18 @@ const sendMessage = (payload: Event) => {
     const message = payload?.target as HTMLInputElement
     // Prevent spacing values
     if (message.value.trim() != '') {
-        chatMessage.value = {
-            user: sender,
+        const messageData = {
+            user: currentUser,
             itemType: '',
             isSentByViewer: true,
             text: message.value,
-            timestamp: getCurrentTimestamp()
+            timestamp: getCurrentTimestamp(),
+            room: activeConversation.value?.uuid
         }
-        // Reset message
+
+        chatMessage.value = messageData
+        // console.log("messageData: ", messageData);
+        socket.emit('send_message', messageData)
         message.value = ''
     }
 }
@@ -351,7 +397,9 @@ const triggerFileUpload = () => {
  * @param message Message to be added
  */
 const addToChat = (message: ChatDialog) => {
-    activeConversation.value?.dialogs.push(message)
+    if (activeConversation.value) {
+        activeConversation.value.dialogs.push(message);
+    }
 }
 
 /**
@@ -372,7 +420,7 @@ const onFileUpload = async (event: Event) => {
         isFileUploaded.value = true
 
         chatMessage.value = {
-            user: sender,
+            user: currentUser,
             itemType: 'image',
             isSentByViewer: true,
             img: attachmentImage.value as string,
@@ -388,10 +436,14 @@ const onFileUpload = async (event: Event) => {
  * @param convo - Conversation to be selected
  */
 const selectConversation = (convo: Conversation) => {
-    const dialogA = new ChatDialogSample(sender)
-    const dialogB = new ChatDialogSample(viewer)
-    convo.dialogs.push(dialogA, dialogB)
+    // const dialogA = new ChatDialogSample(sender)
+    // const dialogB = new ChatDialogSample(viewer)
+    // convo.dialogs.push(dialogA, dialogB)
     activeConversation.value = convo
+    if (activeConversation.value) {
+        console.log(" join room:", activeConversation.value.uuid);
+        socket.emit('join_room', activeConversation.value.uuid)
+    }
 }
 
 /**
@@ -413,7 +465,12 @@ const onUnsupportedFeatureClick = () => {
  */
 const resetChatMessage = () => {
     chatMessage.value = {
-        text: undefined
+        user: undefined,
+        uqSeqId: undefined,
+        itemType: undefined,
+        isSentByViewer: undefined,
+        text: undefined,
+        timestamp: undefined
     }
 }
 
