@@ -10,26 +10,22 @@ router = APIRouter(
 )
 
 # Retrieves the list of chatrooms
-@router.get("/chatrooms", response_model=list[dto.Chatroom])
-def get_chatrooms(user_id: int, user: dependencies.user_dependency) -> list[db.Chatroom]:
-    if user.user_id != user_id:
-        raise HTTPException(status_code=403, detail="Forbidden")
-    chatrooms = chatroom_service.get_chatrooms(user_id)
+@router.get("/", response_model=list[dto.Chatroom])
+def get_chatrooms(user: dependencies.user_dependency) -> list[db.Chatroom]:
+    chatrooms = chatroom_service.get_chatrooms(user.user_id)
     return chatrooms
 
-@router.post("/chatrooms", response_model=dto.Chatroom)
-def add_chatroom(user_id: int, members_id: list[int], user: dependencies.user_dependency, chatroom_name: str = None) -> db.Chatroom:
-    if user.user_id != user_id:
-        raise HTTPException(status_code=403, detail="Forbidden")
-    if user_id not in members_id:
-        members_id.append(user_id)
+@router.post("/", response_model=dto.Chatroom)
+def add_chatroom(members_id: list[int], user: dependencies.user_dependency, chatroom_name: str = None) -> db.Chatroom:
+    if user.user_id not in members_id:
+        members_id.append(user.user_id)
     if len(members_id) < 2:
         raise HTTPException(status_code=400, detail="A chatroom must have at least 2 members")
     
     chatroom_id = chatroom_service.add_chatroom(members_id, chatroom_name)
 
     if len(members_id) == 2:
-        friend_id = [mid for mid in members_id if mid != user_id][0]
+        friend_id = [mid for mid in members_id if mid != user.user_id][0]
         friend = user_service.get_by_user_id(friend_id)
         friend_name = friend.username
     else:
@@ -41,13 +37,22 @@ def add_chatroom(user_id: int, members_id: list[int], user: dependencies.user_de
     )
 
 # Retrieves the details of the chatroom
-@router.get("/chatrooms/{chatroom_id}",response_model=dto.Chatroom)
-def get_chatroom(user_id: int, chatroom_id: int, user: dependencies.user_dependency) -> db.Chatroom:
-    if user.user_id != user_id:
-        raise HTTPException(status_code=403, detail="Forbidden")
+@router.get("/{chatroom_id}",response_model=dto.Chatroom)
+def get_chatroom(chatroom_id: bytes, user: dependencies.user_dependency) -> db.Chatroom:
     chatroom = chatroom_service.get_chatroom(chatroom_id)
     return chatroom
 
-@router.post("/chatrooms/{chatroom_id}", response_model=None)
-def update_chatroom(chatroom_id: int, user: dependencies.user_dependency) -> None:
-    return
+# @router.post("/{chatroom_id}", response_model=None)
+# def update_chatroom(chatroom_id: bytes, user: dependencies.user_dependency) -> None:
+#     return
+
+@router.get("/{chatroom_id}/messages", response_model = list[dto.Message])
+def get_messages(chatroom_id: bytes, user: dependencies.user_dependency) -> list[db.Message]:
+    messages = chatroom_service.get_messages(chatroom_id)
+    return messages
+
+@router.post("/{chatroom_id}/message", response_model = dto.Message)
+def add_message(chatroom_id: bytes, message: dto.Message , user: dependencies.user_dependency) -> db.Message:
+    
+    pass
+

@@ -1,5 +1,6 @@
+import uuid
 from sqlalchemy.sql import func
-from sqlalchemy import Column, Integer, String, ForeignKey, DateTime
+from sqlalchemy import BINARY, Column, Integer, String, ForeignKey, DateTime, Text, Enum, Index
 from sqlalchemy.orm import relationship
 
 from sqlalchemy.ext.declarative import declarative_base
@@ -30,17 +31,26 @@ class Friend(Base):
 class Chatroom(Base):
     __tablename__ = 'chatrooms'
     
-    chatroom_id = Column(Integer, primary_key=True, autoincrement=True)
+    chatroom_id = Column(BINARY(16), primary_key=True, default=uuid.uuid4().bytes)
     chatroom_name = Column(String(32), nullable=True)  # Name of the chatroom (null for private chats)
     created_at = Column(DateTime, default=func.current_timestamp())
 
-    #participants = relationship("Participant", back_populates="chatroom")
 
 class Participant(Base):
     __tablename__ = 'participants'
     
-    chatroom_id = Column(Integer, ForeignKey('chatrooms.chatroom_id', ondelete='CASCADE'), primary_key=True)
+    chatroom_id = Column(BINARY(16), ForeignKey('chatrooms.chatroom_id', ondelete='CASCADE'), primary_key=True)
     user_id = Column(Integer, ForeignKey('users.user_id', ondelete='CASCADE'), primary_key=True)
+
     
-    # chatroom = relationship('Chatroom', back_populates='participants')
-    # user = relationship('User', back_populates='participants')
+class Message(Base):
+    __tablename__ = 'messages'
+    
+    message_id = Column(Integer, primary_key=True, autoincrement=True)
+    chatroom_id = Column(BINARY(16), ForeignKey('chatrooms.chatroom_id'))
+    user_id = Column(Integer)
+    content = Column(Text)
+    message_type = Column(Enum('text', 'image', 'audio', 'file', 'video'))
+    media_url = Column(String(255))
+    read_status = Column(Enum('read', 'unread', 'delivered'))
+    timestamp = Column(DateTime, default=func.current_timestamp())

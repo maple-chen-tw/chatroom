@@ -33,7 +33,10 @@ export interface Reactions {
  */
 export interface ChatDialog {
     /** ID of the chat item */
-    utemId?: string
+    message_id: number
+
+    /** The ID of the chatroom this message belongs to */
+    chatroom_id: string  // UUID string of the chatroom (BINARY(16) stored in backend)
 
     /** A simple instance of the user */
     user?: Sender | Viewer
@@ -42,22 +45,17 @@ export interface ChatDialog {
     timestamp?: number
 
     /** Type of the chat item */
-    itemType?: string
+    message_type: 'text' | 'image' | 'audio' | 'file' | 'video'  // Type of message
 
     /** Indicates if the chat item is sent by the viewer */
     isSentByViewer?: boolean
 
-    /** Unique sequence ID of the chat item */
-    uqSeqId?: number
 
     /** Text content of the chat item */
-    text?: string
+    content?: string
 
     /** Image as a data URI scheme of the chat item*/
     img?: string
-
-    /** Reactions associated with the chat item */
-    reactions?: Reactions
 }
 
 /**
@@ -123,9 +121,7 @@ export interface Sender extends User {
 export interface Invitation {
     /** Unique identifier for the Invitation */
     uuid: string
-    //
     user: User
-
     status: 'pending' | 'accepted' | 'rejected' | 'deleted';
 
 }

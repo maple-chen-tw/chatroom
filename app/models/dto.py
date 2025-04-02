@@ -1,5 +1,6 @@
 # app/models/user.py
-from pydantic import BaseModel, EmailStr
+from enum import Enum
+from pydantic import BaseModel
 from datetime import datetime
 from pydantic import Field
 
@@ -53,6 +54,28 @@ class Friend(BaseModel):
     avatar_url: str | None = None
 
 class Chatroom(BaseModel):
-    chatroom_id: int
+    chatroom_id: bytes
     chatroom_name: str | None = None
     friend_name: str
+
+class MessageType(str, Enum):
+    text = 'text'
+    image = 'image'
+    audio = 'audio'
+    file = 'file'
+    video = 'video'
+
+class ReadStatus(str, Enum):
+    read = 'read'
+    unread = 'unread'
+    delivered = 'delivered'
+
+class Message(BaseModel):
+    message_id: int
+    chatroom_id: bytes
+    user_id: int
+    content:  str | None = None
+    message_type: MessageType
+    media_url:  str | None = None
+    read_status: ReadStatus
+    timestamp:  str | None = None

@@ -12,7 +12,6 @@ router = APIRouter(
     tags=["Auth"]
 )
 
-
 @router.post("/register", status_code=status.HTTP_201_CREATED, response_model=dto.GetUser)
 async def register(user: dto.CreateUser):
 
@@ -69,16 +68,8 @@ async def logout(user: dependencies.user_dependency):
     # let client delete token from local 
     return {"msg": "Successfully logged out"}
 
-
 @router.get("/users/me/", response_model=dto.GetUser)
 async def read_users_me(
     user: dependencies.user_dependency,
 ):
     return user
-
-
-@router.get("/users/me/items/")
-async def read_own_items(
-    user: dependencies.user_dependency,
-):
-    return [{"item_id": "Foo", "owner": user.username}]

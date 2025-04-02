@@ -1,6 +1,6 @@
-from app.models.db import Chatroom, Participant
+from app.models.db import Chatroom, Participant, Message, User
 from app.db.context import session_maker
-from app.models.db import User
+from app.models import dto
 def get_chatrooms(user_id: int):
     with session_maker() as session:
         chatrooms = session.query(
@@ -49,6 +49,33 @@ def add_chatroom(members_id: list[int], chatroom_name: str = None):
             session.commit()
 
             return chatroom_id
+
+        except Exception as e:
+            session.rollback()
+            raise e
+
+
+def get_messages(chatroom_id: bytes):
+
+    return
+
+def add_message(chatroom_id: bytes, message: dto.Message, user_id):
+    with session_maker() as session:
+        try:
+
+            new_message = Message(
+                chatroom_id=chatroom_id,
+                user_id=user_id,
+                content=message.content,
+                message_type=message.message_type,
+                media_url=message.media_url,
+                read_status=message.read_status
+            )
+            
+            session.add(new_message)
+            session.commit()
+            
+            return new_message.message_id
 
         except Exception as e:
             session.rollback()

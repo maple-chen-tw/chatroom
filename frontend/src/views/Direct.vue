@@ -252,7 +252,7 @@ onMounted(async () => {
             const isSentByViewer = messageData.user?.id === currentUser.value?.id;
             messageData.isSentByViewer = isSentByViewer;
 
-            if (!activeConversation.value.dialogs.some((dialog: ChatDialog) => dialog.text === messageData.text && dialog.timestamp === messageData.timestamp)) {
+            if (!activeConversation.value.dialogs.some((dialog: ChatDialog) => dialog.content === messageData.content && dialog.timestamp === messageData.timestamp)) {
             activeConversation.value.dialogs.push(messageData);
         }
       }
@@ -345,12 +345,14 @@ const currentUser: Sender = user
 
 // Active Chat Message
 const chatMessage = ref<ChatDialog>({
+    message_id: undefined,
+    chatroom_id: undefined,
     user: undefined,
-    uqSeqId: undefined,
-    itemType: undefined,
+    timestamp: undefined,
+    message_type: undefined,
     isSentByViewer: undefined,
-    text: undefined,
-    timestamp: undefined
+    content: undefined,
+    
 })
 
 // Change InboxPanel
@@ -370,12 +372,13 @@ const sendMessage = (payload: Event) => {
     // Prevent spacing values
     if (message.value.trim() != '') {
         const messageData = {
+            // message_id: undefined,
+            chatroom_id: activeConversation.value?.uuid,
             user: currentUser,
-            itemType: '',
+            timestamp:  getCurrentTimestamp(),
+            message_type: "text",
             isSentByViewer: true,
-            text: message.value,
-            timestamp: getCurrentTimestamp(),
-            room: activeConversation.value?.uuid
+            content: message.value,
         }
 
         chatMessage.value = messageData
@@ -534,4 +537,8 @@ watch(activeConversation, () => {
         scrollToTheLatestMessage()
     }, WAITING_TIME)
 })
+
+
+// 1. 把訊息存起來
+// 2. 載入歷史訊息: 要怎麼階段載入? 實務上都是往上拉->載入一段歷史訊息->再往上拉->再載入
 </script>
