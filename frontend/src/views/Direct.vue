@@ -7,6 +7,7 @@
                 <!-- activePanel -->
                 <InboxPanel
                   v-if="activePanel === 'user'"
+                  :friends="friends"
                   :conversations="conversations"
                   :invitations=null
                   :active-panel="activePanel"
@@ -132,22 +133,12 @@ const socket = io("http://localhost:8000", {
     reconnectionAttempts: 5,
     reconnectionDelay: 1000,
 });
-socket.on('connect', () => {
-    console.log("✅ Connected to WebSocket server");
-});
-socket.on('connect_error', (err) => {
-    console.error("❌ WebSocket connection error:", err);
-});
-
-// ✅ 重新連線成功
-socket.on('reconnect', (attempt) => {
-    console.log(`🔄 WebSocket reconnected (attempt ${attempt})`);
-});
 
 const router = useRouter()
 
 const token: string | null = localStorage.getItem('auth-token');
 const user = ref<User | null>(null);
+const friends = ref<Friend[]>([]);
 const conversations = ref<Conversation[]>([]);
 const invitations = ref<Invitation[]>([]);
 const activeConversation = ref<Conversation | undefined>(undefined)
@@ -190,6 +181,8 @@ const fetchFriendsList = async (token: string) => {
 };
 
 const createConversations = (friends: Friend[], user_id: string) => {
+
+
     return friends.map(friend => {
         const roomId = [user_id, friend.user_id].sort().join('-');
         return {
@@ -245,17 +238,21 @@ onMounted(async () => {
     // ✅ 伺服器傳來的訊息
 
     socket.on("receive_message", (messageData: ChatDialog) => {
+    try {
+        // Check if there's an active conversation and if it has a uuid
+        if (activeConversation.value && activeConversation.value.uuid) {
+          console.log('Message received');
+          const isSentByViewer = messageData.user?._value?.id === currentUser.value?.id;
+          messageData.isSentByViewer = isSentByViewer;
 
-    if (activeConversation.value && activeConversation.value.uuid) {
-            console.log("Adding message to active conversation");
+          activeConversation.value.dialogs.push(messageData);
 
-            const isSentByViewer = messageData.user?.id === currentUser.value?.id;
-            messageData.isSentByViewer = isSentByViewer;
-
-            if (!activeConversation.value.dialogs.some((dialog: ChatDialog) => dialog.content === messageData.content && dialog.timestamp === messageData.timestamp)) {
-            activeConversation.value.dialogs.push(messageData);
-        }
+          //console.log(activeConversation.value.dialogs);
       }
+    } catch (error) {
+      // Log the error if something goes wrong during the process
+      console.error("Error while processing received message:", error);
+    }
     });
 
     const router = useRouter();
@@ -268,21 +265,35 @@ onMounted(async () => {
     try {
 
         user.value = await fetchUserInfo(token);
-        const friends = await fetchFriendsList(token);
-        conversations.value = createConversations(friends, user.value?.id);
+        friends.value = await fetchFriendsList(token);
+        conversations.value = createConversations(friends.value, user.value?.id);
         const invits = await fetchInvitationList(token);
         invitations.value = createInvitations(invits);
-        
 
+        socket.on('connect', () => {
+            console.log("✅ Connected to WebSocket server");
+            if (user.value?.id) {
+                socket.emit('set_user_id', user.value.id); // Send the user ID to the server
+            }
+        });
     } catch (error) {
-        console.error("Error in onMounted:", error);
+        console.error("Error fetching user info:", error);
     }
+        socket.on('connect_error', (err) => {
+            console.error("❌ WebSocket connection error:", err);
+        });
+
+        // ✅ 重新連線成功
+        socket.on('reconnect', (attempt) => {
+            console.log(`🔄 WebSocket reconnected (attempt ${attempt})`);
+        });
 
 
 });
 
 onUnmounted(() => {
     socket.off("receive_message");
+    socket.off("connect");
 });
 
 
@@ -373,6 +384,7 @@ const sendMessage = (payload: Event) => {
     if (message.value.trim() != '') {
         const messageData = {
             // message_id: undefined,
+
             chatroom_id: activeConversation.value?.uuid,
             user: currentUser,
             timestamp:  getCurrentTimestamp(),
@@ -468,13 +480,14 @@ const onUnsupportedFeatureClick = () => {
  */
 const resetChatMessage = () => {
     chatMessage.value = {
+        message_id: undefined,
+        chatroom_id: undefined,
         user: undefined,
-        uqSeqId: undefined,
-        itemType: undefined,
+        timestamp: undefined,
+        message_type: undefined,
         isSentByViewer: undefined,
-        text: undefined,
-        timestamp: undefined
-    }
+        content: undefined,
+        }
 }
 
 /**
@@ -489,7 +502,7 @@ const openSendMessageModal = () => {
  */
 const sendHeartEmoji = () => {
     chatMessage.value = {
-        text: undefined
+        content: undefined
     }
 }
 
@@ -510,7 +523,7 @@ const scrollToTheLatestMessage = () => {
  */
 const shouldUpdateInbox = () => {
     const message = chatMessage.value
-    return (message.text != undefined || message.img != undefined)
+    return (message.content != undefined || message.img != undefined)
 }
 
 
@@ -520,7 +533,7 @@ const shouldUpdateInbox = () => {
  */
 watch(chatMessage, () => {
     if (shouldUpdateInbox()) {
-        addToChat(chatMessage.value)
+        //addToChat(chatMessage.value)
         resetChatMessage()
         scrollToTheLatestMessage()
     }

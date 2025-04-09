@@ -52,10 +52,15 @@ import {
 import type {
     Conversation,
     Invitation,
-    Viewer
+    Viewer,
+    Friend,
 } from '@/common'
 
 const props = defineProps({
+    friends: {
+        type: Array as() => Friend[] | undefined,
+        required: false
+    },
     conversations: {
         type: Array as() => Conversation[] | undefined,
         required: false

@@ -258,6 +258,11 @@ const sendFriendRequest = async (friend: Friend) => {
 
       // Update conversations list by adding the accepted user
       if (Array.isArray(props.conversations)) {
+        if (userId.value){
+          createFriendChatroom(userId.value, invit);
+        } else {
+        console.log('User ID is not available');
+        }
         const updatedConversations = [...props.conversations, { user: invit.user }];
         emit('update-conversations', updatedConversations);
       }
@@ -280,6 +285,36 @@ const sendFriendRequest = async (friend: Friend) => {
     }
   }
 };
+
+/**
+ * Create New Chatroom with friend
+ */
+
+const createFriendChatroom = async(user_id: string, invit: Invitation) => {
+  console.log(`create Friend Chatroom for ${invit.user.userName}`)
+  try {
+    const chatroomName = "Default Chatroom";
+    const members_id = [invit.user.id, user_id]
+    const response = await axios.post('chatrooms/', {
+      members_id: members_id,
+      chatroom_name: chatroomName,
+    }, {
+      headers: {
+        "Authorization": `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    console.log("Chatroom created:", response.data);
+
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      console.error('Error creating Friend Chatroom:', error.response?.data || error.message);
+    } else {
+      console.error('Unexpected error occurred:', error);
+    }
+  }
+}
 
 /**
  * Reject friend request

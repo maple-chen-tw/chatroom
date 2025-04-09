@@ -58,6 +58,10 @@ class Chatroom(BaseModel):
     chatroom_name: str | None = None
     friend_name: str
 
+class CreateChatroom(BaseModel):
+    chatroom_name: str = 'Default Chatroom'
+    members_id: list[int]
+
 class MessageType(str, Enum):
     text = 'text'
     image = 'image'
@@ -79,3 +83,10 @@ class Message(BaseModel):
     media_url:  str | None = None
     read_status: ReadStatus
     timestamp:  str | None = None
+
+class ChatroomWithFriend(BaseModel):
+    chatroom_id: bytes
+    chatroom_name: str | None = None
+    friend_username: str
+    friend_nickname: str
+    friend_avatar_url: str

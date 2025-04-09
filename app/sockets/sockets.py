@@ -8,6 +8,8 @@ sio = socketio.AsyncServer(
     transports=["polling", "websocket"],
 )
 
+user_sockets = {}
+
 # 創建 ASGI 應用程式
 sio_app = socketio.ASGIApp(sio, socketio_path="/ws/socket.io")
 # sio_app = socketio.ASGIApp(sio_server)
@@ -16,6 +18,12 @@ sio_app = socketio.ASGIApp(sio, socketio_path="/ws/socket.io")
 @sio.event
 async def connect(sid, environ, auth):
     print(f"User {sid} connected")
+
+@sio.event
+def set_user_id(sid, user_id):
+    # Associate the socket ID with the user_id
+    user_sockets[sid] = user_id
+    print(f"User {user_id} is now connected with socket {sid}")
 
 # 監聽使用者加入房間
 @sio.event
@@ -26,33 +34,33 @@ async def join_room(sid, room_id):
 # 監聽使用者發送訊息
 @sio.event
 async def send_message(sid, data):
-    room_id = data.get("room")
-    message = data.get("text")
+    chatroom_id = data.get("chatroom_id")
+    message = data.get("content")
     timestamp = data.get("timestamp")
     user = data.get("user")
-    item_type = data.get("itemType")
+    message_type = data.get("message_type")
     is_sent_by_viewer = data.get("isSentByViewer")
 
-    if not room_id or not message:
-        print(f"Invalid message data: {data}")
+    if not chatroom_id or not message:
+        print(f"Invalid message data")
+        print(f"Room ID: {chatroom_id}")
+        print(f"Message: {message}")
         return
 
-    print(f"User {sid} sent message to room {room_id}: {message}")
+    print(f"User {sid} sent message to room {chatroom_id}: {message}")
 
     # 廣播訊息到該房間
     message_data = {
-        # "utemId": "unique-id",
+        "chatroom_id":chatroom_id,
+        "content": message,
+        "isSentByViewer": is_sent_by_viewer,
         "user": user,
         "timestamp": timestamp,
-        "itemType": item_type,
-        "isSentByViewer": is_sent_by_viewer,
-        # "uqSeqId": 1,
-        "text": message,
+        "message_type": message_type,
         "img": "",
-        "reactions": []
     }
  
-    await sio.emit("receive_message", message_data, room=room_id)
+    await sio.emit("receive_message", message_data, room=chatroom_id)
 
 # 監聽使用者傳送一般訊息（非房間聊天）
 @sio.event

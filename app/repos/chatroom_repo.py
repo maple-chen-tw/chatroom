@@ -18,13 +18,17 @@ def get_chatrooms(user_id: int):
             if len(participants) == 2:
                 other_user_id = next(p.user_id for p in participants if p.user_id != user_id)
                 friend = session.query(User).filter(User.user_id == other_user_id).first()
-                friend_name = friend.username if friend else None
+                friend_username = friend.username if friend else None
+                friend_nickname = friend.nickname
+                friend_avatar_url = friend.avatar_url 
             else:
-                friend_name = None
+                friend_username = None
             result.append({
                 'chatroom_id': chatroom.chatroom_id,
                 'chatroom_name': chatroom.chatroom_name or "private chatroom",
-                'friend_name': friend_name
+                'friend_username': friend_username,
+                'friend_nickname': friend_nickname,
+                'friend_avatar_url': friend_avatar_url,
             })
 
     return result
@@ -59,10 +63,10 @@ def get_messages(chatroom_id: bytes):
 
     return
 
-def add_message(chatroom_id: bytes, message: dto.Message, user_id):
+def add_message(chatroom_id: bytes, message: dto.Message, user_id: int):
+
     with session_maker() as session:
         try:
-
             new_message = Message(
                 chatroom_id=chatroom_id,
                 user_id=user_id,

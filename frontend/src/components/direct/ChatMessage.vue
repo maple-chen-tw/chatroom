@@ -14,13 +14,13 @@
 			<!-- TODO: Change to active user img based on user store -->
 
 		<p 
-			v-if="dialog.text"
+			v-if="dialog.content"
 			class="break-words p-3 border border-[#1f1f1f] rounded-lg text-white lg:text-sm text-xs max-w-xs"
 			:class="{ 
 				'm-2 bg-gray-1100 md:bg-sky-1100': dialog.isSentByViewer, 
 				'md:bg-[#262626]': !dialog.isSentByViewer 
 			}">
-			{{ dialog.text }}
+			{{ dialog.content }}
 		</p>
 
 		<img 
