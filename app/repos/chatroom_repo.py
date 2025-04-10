@@ -1,6 +1,8 @@
 from app.models.db import Chatroom, Participant, Message, User
 from app.db.context import session_maker
 from app.models import dto
+import uuid
+
 def get_chatrooms(user_id: int):
     with session_maker() as session:
         chatrooms = session.query(
@@ -18,17 +20,24 @@ def get_chatrooms(user_id: int):
             if len(participants) == 2:
                 other_user_id = next(p.user_id for p in participants if p.user_id != user_id)
                 friend = session.query(User).filter(User.user_id == other_user_id).first()
+                friend_user_id = friend.user_id
                 friend_username = friend.username if friend else None
                 friend_nickname = friend.nickname
-                friend_avatar_url = friend.avatar_url 
+                friend_avatar_url = friend.avatar_url
+                friend_status = friend.status
             else:
                 friend_username = None
+
+            chatroom_id_str = str(uuid.UUID(bytes=chatroom.chatroom_id))
+
             result.append({
-                'chatroom_id': chatroom.chatroom_id,
+                'chatroom_id': chatroom_id_str,
                 'chatroom_name': chatroom.chatroom_name or "private chatroom",
-                'friend_username': friend_username,
-                'friend_nickname': friend_nickname,
-                'friend_avatar_url': friend_avatar_url,
+                'user_id': friend_user_id,
+                'username': friend_username,
+                'nickname': friend_nickname,
+                'avatar_url': friend_avatar_url,
+                'status': friend_status,
             })
 
     return result
@@ -52,7 +61,8 @@ def add_chatroom(members_id: list[int], chatroom_name: str = None):
             session.add_all(participants)
             session.commit()
 
-            return chatroom_id
+            chatroom_id_str = str(uuid.UUID(bytes=chatroom_id))
+            return chatroom_id_str
 
         except Exception as e:
             session.rollback()

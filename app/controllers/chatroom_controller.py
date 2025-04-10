@@ -35,15 +35,15 @@ def add_chatroom(chatroom: dto.CreateChatroom ,user: dependencies.user_dependenc
             raise HTTPException(status_code=400, detail="A chatroom must have at least 2 members")
 
         chatroom_id = chatroom_service.add_chatroom(members_id, chatroom_name)
-        chatroom_id_str = str(uuid.UUID(bytes=chatroom_id))
         if len(members_id) == 2:
             friend_id = [mid for mid in members_id if mid != user.user_id][0]
             friend = user_service.get_by_user_id(friend_id)
             friend_name = friend.username
         else:
             friend_name = None
+            
         return dto.Chatroom(
-            chatroom_id=chatroom_id_str,
+            chatroom_id=chatroom_id,
             chatroom_name=chatroom_name,
             friend_name=friend_name
         )

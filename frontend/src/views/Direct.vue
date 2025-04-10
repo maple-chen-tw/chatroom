@@ -7,7 +7,7 @@
                 <!-- activePanel -->
                 <InboxPanel
                   v-if="activePanel === 'user'"
-                  :friends="friends"
+                  :chatroomWithFriends="chatroomWithFriends"
                   :conversations="conversations"
                   :invitations=null
                   :active-panel="activePanel"
@@ -24,7 +24,7 @@
                   :activeConversation=null
                   :current-user="currentUser"
                   @update-invitations="updatedInvitations"
-                  @update-conversations="updatedConverations"
+                  @update-conversations="updatedConversations"
                 />
               
                 <InboxPanel
@@ -101,6 +101,7 @@ import type {
     HTMLInputElementRef,
     PhotoModalImage,
     Conversation,
+    ChatroomWithFriend,
     Friend,
     Invitation
 } from '@/common'
@@ -138,7 +139,7 @@ const router = useRouter()
 
 const token: string | null = localStorage.getItem('auth-token');
 const user = ref<User | null>(null);
-const friends = ref<Friend[]>([]);
+const chatroomWithFriends = ref<ChatroomWithFriend[]>([]);
 const conversations = ref<Conversation[]>([]);
 const invitations = ref<Invitation[]>([]);
 const activeConversation = ref<Conversation | undefined>(undefined)
@@ -180,13 +181,11 @@ const fetchFriendsList = async (token: string) => {
     }
 };
 
-const createConversations = (friends: Friend[], user_id: string) => {
+const createConversations = (chatroomWithFriends: ChatroomWithFriend[], user_id: string) => {
 
-
-    return friends.map(friend => {
-        const roomId = [user_id, friend.user_id].sort().join('-');
+    return chatroomWithFriends.map(friend => {
         return {
-            uuid: `room-${roomId}`,
+            uuid: friend.chatroom_id,
             user: {
                 id: friend.user_id,
                 userName: friend.username,
@@ -201,6 +200,19 @@ const createConversations = (friends: Friend[], user_id: string) => {
     });
 };
 
+const fetchChatroomWithFriendsList = async (token: string) => {
+    try {
+        const response = await axios.get("/chatrooms/", {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error("Error fetching friends list:", error);
+        throw error;
+    }
+}
 
 const fetchInvitationList = async (token: string) => {
     try {
@@ -234,29 +246,7 @@ const createInvitations = (friends: Friend[]) => {
 };
 
 onMounted(async () => {
-    
-    // ✅ 伺服器傳來的訊息
-
-    socket.on("receive_message", (messageData: ChatDialog) => {
-    try {
-        // Check if there's an active conversation and if it has a uuid
-        if (activeConversation.value && activeConversation.value.uuid) {
-          console.log('Message received');
-          const isSentByViewer = messageData.user?._value?.id === currentUser.value?.id;
-          messageData.isSentByViewer = isSentByViewer;
-
-          activeConversation.value.dialogs.push(messageData);
-
-          //console.log(activeConversation.value.dialogs);
-      }
-    } catch (error) {
-      // Log the error if something goes wrong during the process
-      console.error("Error while processing received message:", error);
-    }
-    });
-
     const router = useRouter();
-
     if (!token) {
         router.push('/accounts/login');
         return;
@@ -265,8 +255,9 @@ onMounted(async () => {
     try {
 
         user.value = await fetchUserInfo(token);
-        friends.value = await fetchFriendsList(token);
-        conversations.value = createConversations(friends.value, user.value?.id);
+        chatroomWithFriends.value = await fetchChatroomWithFriendsList(token);
+        console.log("ChatroomWithFriend:", chatroomWithFriends.value)
+        conversations.value = createConversations(chatroomWithFriends.value, user.value?.id);
         const invits = await fetchInvitationList(token);
         invitations.value = createInvitations(invits);
 
@@ -288,7 +279,24 @@ onMounted(async () => {
             console.log(`🔄 WebSocket reconnected (attempt ${attempt})`);
         });
 
+        // ✅ 伺服器傳來的訊息
+    socket.on("receive_message", (messageData: ChatDialog) => {
+    try {
+        // Check if there's an active conversation and if it has a uuid
+        if (activeConversation.value && activeConversation.value.uuid) {
+          console.log('Message received');
+          const isSentByViewer = messageData.user?._value?.id === currentUser.value?.id;
+          messageData.isSentByViewer = isSentByViewer;
 
+          activeConversation.value.dialogs.push(messageData);
+
+          //console.log(activeConversation.value.dialogs);
+      }
+    } catch (error) {
+      // Log the error if something goes wrong during the process
+      console.error("Error while processing received message:", error);
+    }
+    });
 });
 
 onUnmounted(() => {
@@ -301,7 +309,7 @@ const updateUserData = (updatedUser) => {
   user.value = updatedUser; // 更新用戶資料
 };
 
-const updatedConverations = (newConversations: Conversation[]) => {
+const updatedConversations = (newConversations: Conversation[]) => {
   conversations.value = newConversations
 }
 

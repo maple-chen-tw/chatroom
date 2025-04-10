@@ -81,12 +81,24 @@ export interface Conversation {
     isActive: boolean
 }
 
+export interface ChatroomWithFriend {
+    chatroom_id: string;
+    chatroom_name: string;
+    user_id: number;
+    username: string;
+    nickname: string | null;
+    avatar_url: string | null;
+    status: string | null;
+}
+
+
 export interface Friend {
     user_id: number;
     username: string;
     nickname: string | null;
     avatar_url: string | null;
 }
+
 /**
  * Represents an inbox containing chat threads.
  */

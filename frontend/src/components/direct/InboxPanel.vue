@@ -15,13 +15,14 @@
                 :invitations="invitations"
                 :conversations="conversations"
                 @update-invitations="updatedInvitations"
-                @update-conversations="updatedConverations"
+                @update-conversations="updatedConversations"
                 />
             </div>
             <div v-else-if="activePanel === 'user'">
 			<!-- user -->
-			<InboxFriends 
+			<InboxFriends
 				:active-conversation-id="activeConversation?.uuid"
+                :chatroomWithFriends="chatroomWithFriends"
 				:conversations="conversations"
 				@on-select-conversation="$emit('onSelectConversation', $event as Conversation)" />
             </div>
@@ -54,11 +55,12 @@ import type {
     Invitation,
     Viewer,
     Friend,
+    ChatroomWithFriend
 } from '@/common'
 
 const props = defineProps({
-    friends: {
-        type: Array as() => Friend[] | undefined,
+    chatroomWithFriends: {
+        type: Array as() => ChatroomWithFriend[] | undefined,
         required: false
     },
     conversations: {
@@ -88,7 +90,7 @@ const updatedInvitations = (newInvitations: Invitation[]) => {
     emit('update-invitations', newInvitations)
 }
 
-const updatedConverations = (newConversations: Conversation[]) => {
+const updatedConversations = (newConversations: Conversation[]) => {
     emit('update-conversations', newConversations)
 }
 
