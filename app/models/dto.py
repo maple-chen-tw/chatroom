@@ -84,14 +84,13 @@ class ReadStatus(str, Enum):
     delivered = 'delivered'
 
 class Message(BaseModel):
-    message_id: int
     chatroom_id: bytes
-    user_id: int
+    sender_id: int
     content:  str | None = None
     message_type: MessageType
     media_url:  str | None = None
     read_status: ReadStatus
-    timestamp:  str | None = None
+    timestamp:  datetime | None = None
     @property
     def chatroom_id_str(self) -> str:
         """Converts binary chatroom_id to a UUID string."""

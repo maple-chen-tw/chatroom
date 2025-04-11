@@ -86,10 +86,6 @@ const props = defineProps({
         type: Object as() => Conversation[] | undefined,
         required: true
     },
-    activeConversationId: {
-        type: String as() => Conversation['uuid'] | undefined,
-        default: undefined
-    },
   invitations: {
         type: Object as() => Invitation[] | undefined,
         required: true

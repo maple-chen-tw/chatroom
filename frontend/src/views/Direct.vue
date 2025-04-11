@@ -12,7 +12,7 @@
                   :invitations=null
                   :active-panel="activePanel"
                   :activeConversation=null
-                  :current-user="currentUser"
+                  :current-user="user"
                   @on-select-conversation="selectConversation"
                 />
 
@@ -22,7 +22,7 @@
                   :invitations="invitations"
                   :active-panel="activePanel"
                   :activeConversation=null
-                  :current-user="currentUser"
+                  :current-user="user"
                   @update-invitations="updatedInvitations"
                   @update-conversations="updatedConversations"
                 />
@@ -33,7 +33,7 @@
                   :invitations=null
                   :active-panel="activePanel"
                   :activeConversation=null
-                  :current-user="currentUser"
+                  :current-user="user"
                   @on-select-conversation="selectConversation"
                 />
             
@@ -43,14 +43,14 @@
             <!-- Chat input and Dialogs -->
             <ActiveInfo
                 v-if="activePanel === 'options'"
-                :current-user="currentUser"
+                :current-user="user"
                 @updateUser="updateUserData"
                 />
             <ActiveChat 
                 v-else-if="activeConversation"
                 :active-conversation="activeConversation"
                 v-model="chatMessageInput"
-                :current-user="currentUser"
+                :current-user="user"
                 :is-chat-loading="isChatLoading"
                 :is-chat-empty="true"
                 @on-chat-back="leaveChat"
@@ -122,7 +122,7 @@ import {
 	useRouter 
 } from 'vue-router'
 import { onMounted, onUnmounted } from 'vue';
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { User } from '@/common'
 
 import io from 'socket.io-client'
@@ -134,8 +134,6 @@ const socket = io("http://localhost:8000", {
     reconnectionAttempts: 5,
     reconnectionDelay: 1000,
 });
-
-const router = useRouter()
 
 const token: string | null = localStorage.getItem('auth-token');
 const user = ref<User | null>(null);
@@ -245,6 +243,37 @@ const createInvitations = (friends: Friend[]) => {
 
 };
 
+const addMessageToDB = async (token:string, messageData: ChatDialog) => {
+  if (!activeConversation.value || !activeConversation.value.uuid) return;
+
+  try {
+    const response = await axios.post(
+      `/chatrooms/${activeConversation.value.uuid}/message`, 
+      {
+        "chatroom_id": messageData.chatroom_id,
+        "sender_id": messageData.user?.id,
+        "content": messageData.content,
+        "message_type": messageData.message_type,
+        "read_status": "unread",
+        "timestamp": messageData.timestamp,
+      },
+      {
+        headers: {
+          "Authorization": `Bearer ${token}`
+        }
+      }
+    );
+    console.log('Successfully add message to db.')
+    } catch (error) {
+        if (error instanceof AxiosError){
+            console.error('Failed to add message:', error.response?.data || error.message);
+        } else {
+            console.error('Unexpected error occurred when add message:', error);
+        }
+
+  }
+};
+
 onMounted(async () => {
     const router = useRouter();
     if (!token) {
@@ -287,10 +316,10 @@ onMounted(async () => {
           console.log('Message received');
           const isSentByViewer = messageData.user?._value?.id === currentUser.value?.id;
           messageData.isSentByViewer = isSentByViewer;
+          if(isSentByViewer === false){
+            activeConversation.value.dialogs.push(messageData);
+          };
 
-          activeConversation.value.dialogs.push(messageData);
-
-          //console.log(activeConversation.value.dialogs);
       }
     } catch (error) {
       // Log the error if something goes wrong during the process
@@ -329,38 +358,8 @@ const isFileUploaded = ref<boolean>(false)
 const isFileValid = ref<boolean>(false)
 const isChatLoading = ref<boolean>(false)
 
-
-// Sample data
-//const viewer = new UserSample()
-//const sender = new UserSample()
-
-// const conversationSampleA = new ConversationSample()
-// const conversationSampleB = new ConversationSample()
-// const conversationSampleC = new ConversationSample()
-
-// const invitationSampleA = new InvitationSample()
-// const invitationSampleB = new InvitationSample()
-// const invitationSampleC = new InvitationSample()
-
 //const currentUser: Sender = sender
 const currentUser: Sender = user
-
-// List of all conversations in the inbox
-//const conversations = ref<Conversation[]>([
-//    conversationSampleA,
-//    conversationSampleB,
-//    conversationSampleC
-//])
-
-// List of all invitations in the inbox
-//const invitations = ref<Invitation[]>([
-//    invitationSampleA,
-//    invitationSampleB,
-//    invitationSampleC
-//])
-//console.log(invitations.value);
-
-
 
 // Active Chat Message
 const chatMessage = ref<ChatDialog>({
@@ -459,9 +458,7 @@ const onFileUpload = async (event: Event) => {
  * @param convo - Conversation to be selected
  */
 const selectConversation = (convo: Conversation) => {
-    // const dialogA = new ChatDialogSample(sender)
-    // const dialogB = new ChatDialogSample(viewer)
-    // convo.dialogs.push(dialogA, dialogB)
+    
     activeConversation.value = convo
     if (activeConversation.value) {
         console.log(" join room:", activeConversation.value.uuid);
@@ -541,7 +538,10 @@ const shouldUpdateInbox = () => {
  */
 watch(chatMessage, () => {
     if (shouldUpdateInbox()) {
-        //addToChat(chatMessage.value)
+        addToChat(chatMessage.value)
+        if(token){
+          addMessageToDB(token, chatMessage.value)
+        }
         resetChatMessage()
         scrollToTheLatestMessage()
     }
@@ -559,7 +559,4 @@ watch(activeConversation, () => {
     }, WAITING_TIME)
 })
 
-
-// 1. 把訊息存起來
-// 2. 載入歷史訊息: 要怎麼階段載入? 實務上都是往上拉->載入一段歷史訊息->再往上拉->再載入
 </script>

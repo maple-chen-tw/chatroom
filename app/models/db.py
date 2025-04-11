@@ -48,7 +48,7 @@ class Message(Base):
     
     message_id = Column(Integer, primary_key=True, autoincrement=True)
     chatroom_id = Column(BINARY(16), ForeignKey('chatrooms.chatroom_id'))
-    user_id = Column(Integer)
+    sender_id = Column(Integer)
     content = Column(Text)
     message_type = Column(Enum('text', 'image', 'audio', 'file', 'video'))
     media_url = Column(String(255))

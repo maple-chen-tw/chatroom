@@ -4,7 +4,7 @@ from app.models import db
 from app.models import dto
 from app.services import friend_service, chatroom_service, user_service
 from utils import dependencies
-import uuid
+from uuid import UUID
 router = APIRouter(
     prefix="/chatrooms",
     tags=["Chatrooms"],
@@ -52,8 +52,10 @@ def add_chatroom(chatroom: dto.CreateChatroom ,user: dependencies.user_dependenc
 
 # Retrieves the details of the chatroom
 @router.get("/{chatroom_id}",response_model=dto.Chatroom)
-def get_chatroom(chatroom_id: bytes, user: dependencies.user_dependency) -> db.Chatroom:
-    chatroom = chatroom_service.get_chatroom(chatroom_id)
+def get_chatroom(chatroom_id: str, user: dependencies.user_dependency) -> db.Chatroom:
+    chatroom_uuid = UUID(chatroom_id)
+    chatroom_bytes = chatroom_uuid.bytes
+    chatroom = chatroom_service.get_chatroom(chatroom_bytes)
     return chatroom
 
 # @router.post("/{chatroom_id}", response_model=None)
@@ -61,11 +63,15 @@ def get_chatroom(chatroom_id: bytes, user: dependencies.user_dependency) -> db.C
 #     return
 
 @router.get("/{chatroom_id}/messages", response_model = list[dto.Message])
-def get_messages(chatroom_id: bytes, user: dependencies.user_dependency) -> list[db.Message]:
-    messages = chatroom_service.get_messages(chatroom_id)
+def get_messages(chatroom_id: str, user: dependencies.user_dependency) -> list[db.Message]:
+    chatroom_uuid = UUID(chatroom_id)
+    chatroom_bytes = chatroom_uuid.bytes
+    messages = chatroom_service.get_messages(chatroom_bytes)
     return messages
 
-@router.post("/{chatroom_id}/message", response_model = dto.Message)
-def add_message(chatroom_id: bytes, message: dto.Message , user: dependencies.user_dependency) -> db.Message:
-    message_id = chatroom_service.add_message(chatroom_id=chatroom_id, message=message, user_id = user.user_id)
-    return message_id
+@router.post("/{chatroom_id}/message")
+def add_message(chatroom_id: str, message: dto.Message , user: dependencies.user_dependency)-> None:
+    chatroom_uuid = UUID(chatroom_id)
+    chatroom_bytes = chatroom_uuid.bytes
+    message_id = chatroom_service.add_message(chatroom_id=chatroom_bytes, message=message, user_id = user.user_id)
+    return

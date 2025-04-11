@@ -79,7 +79,7 @@ def add_message(chatroom_id: bytes, message: dto.Message, user_id: int):
         try:
             new_message = Message(
                 chatroom_id=chatroom_id,
-                user_id=user_id,
+                sender_id=user_id,
                 content=message.content,
                 message_type=message.message_type,
                 media_url=message.media_url,
