@@ -1,3 +1,4 @@
+from datetime import datetime
 from fastapi import HTTPException, status, APIRouter
 from fastapi import Path
 from app.models import db
@@ -63,10 +64,10 @@ def get_chatroom(chatroom_id: str, user: dependencies.user_dependency) -> db.Cha
 #     return
 
 @router.get("/{chatroom_id}/messages", response_model = list[dto.Message])
-def get_messages(chatroom_id: str, user: dependencies.user_dependency) -> list[db.Message]:
+def get_messages(chatroom_id: str, limit: int, before: datetime | None,  user: dependencies.user_dependency) -> list[db.Message]:
     chatroom_uuid = UUID(chatroom_id)
     chatroom_bytes = chatroom_uuid.bytes
-    messages = chatroom_service.get_messages(chatroom_bytes)
+    messages = chatroom_service.get_messages(chatroom_bytes, limit, before)
     return messages
 
 @router.post("/{chatroom_id}/message")
