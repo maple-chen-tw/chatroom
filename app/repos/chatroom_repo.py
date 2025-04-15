@@ -1,6 +1,7 @@
 from app.models.db import Chatroom, Participant, Message, User
 from app.db.context import session_maker
 from app.models import dto
+from datetime import datetime
 import uuid
 
 def get_chatrooms(user_id: int):
@@ -69,9 +70,44 @@ def add_chatroom(members_id: list[int], chatroom_name: str = None):
             raise e
 
 
-def get_messages(chatroom_id: bytes):
+def get_messages(chatroom_id: bytes, limit: int, before: datetime | None = None):
+    with session_maker() as session:
+        
+        query = session.query(Message).filter(Message.chatroom_id == chatroom_id)
 
-    return
+        if before:
+            query = query.filter(Message.timestamp < before)
+
+        query = query.distinct()
+        sender_ids = [message.sender_id for message in query.all()]
+
+        users = session.query(User).filter(User.user_id.in_(sender_ids)).all()
+        user_map = {user.user_id: user for user in users}
+
+        query = session.query(Message).filter(Message.chatroom_id == chatroom_id)
+        query = query.order_by(Message.timestamp.desc()).limit(limit)
+        messages = query.all()
+
+        result = []
+        for message in messages:
+            sender = user_map.get(message.sender_id)
+            message_dict = {
+                "chatroom_id": str(uuid.UUID(bytes=message.chatroom_id)),
+                "content": message.content,
+                "message_type": message.message_type,
+                "media_url": message.media_url,
+                "read_status": message.read_status,
+                "timestamp": message.timestamp,
+                "user": {
+                    'id': sender.user_id,
+                    'nickname': sender.nickname,
+                    'username': sender.username,
+                    'profilePictureUrl': sender.avatar_url,
+                }
+            }
+            result.append(dto.Message(**message_dict))
+        return result[::-1]
+
 
 def add_message(chatroom_id: bytes, message: dto.Message, user_id: int):
 

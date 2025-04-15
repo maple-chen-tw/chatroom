@@ -179,24 +179,77 @@ const fetchFriendsList = async (token: string) => {
     }
 };
 
-const createConversations = (chatroomWithFriends: ChatroomWithFriend[], user_id: string) => {
+const getTimeSince = (timestamp: string) => {
+  const now = new Date();
+  const messageTime = new Date(timestamp);
+  const diff = Math.floor((now.getTime() - messageTime.getTime()) / 1000); // in seconds
 
-    return chatroomWithFriends.map(friend => {
-        return {
-            uuid: friend.chatroom_id,
-            user: {
-                id: friend.user_id,
-                userName: friend.username,
-                nickname: friend.nickname || null,
-                profilePictureUrl: friend.avatar_url
-            },
-            lastMessage: 'No messages yet',
-            timeSinceLastMessage: '0 mins ago',
-            dialogs: [],
-            isActive: true
-        };
-    });
+  if (diff < 60) return `${diff}s ago`;
+  if (diff < 3600) return `${Math.floor(diff / 60)} mins ago`;
+  if (diff < 86400) return `${Math.floor(diff / 3600)} hrs ago`;
+
+  return `${Math.floor(diff / 86400)} days ago`;
 };
+
+const createConversations = async (chatroomWithFriends: ChatroomWithFriend[], user_id: string, token: string) => {
+  const convoPromises = chatroomWithFriends.map(async (friend) => {
+    let lastMessage = 'No messages yet';
+    let timeSinceLastMessage = '';
+
+    try {
+      const response = await axios.get(`/chatrooms/${friend.chatroom_id}/messages`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: {
+          limit: 1,
+        },
+      });
+
+      if (response.data.length > 0) {
+        const msg = response.data[0];
+        lastMessage = msg.content || '[No text]';
+        timeSinceLastMessage = getTimeSince(msg.timestamp);
+      }
+    } catch (error) {
+      console.error(`Failed to fetch last message for chatroom ${friend.chatroom_id}`, error);
+    }
+
+    return {
+      uuid: friend.chatroom_id,
+      user: {
+        id: friend.user_id,
+        userName: friend.username,
+        nickname: friend.nickname || null,
+        profilePictureUrl: friend.avatar_url,
+      },
+      lastMessage,
+      timeSinceLastMessage,
+      dialogs: [],
+      isActive: true,
+    };
+  });
+
+  return await Promise.all(convoPromises);
+};
+// const createConversations = async (chatroomWithFriends: ChatroomWithFriend[], user_id: string) => {
+// 
+//     return chatroomWithFriends.map(friend => {
+//         return {
+//             uuid: friend.chatroom_id,
+//             user: {
+//                 id: friend.user_id,
+//                 userName: friend.username,
+//                 nickname: friend.nickname || null,
+//                 profilePictureUrl: friend.avatar_url
+//             },
+//             lastMessage: 'No messages yet',
+//             timeSinceLastMessage: '0 mins ago',
+//             dialogs: [],
+//             isActive: true
+//         };
+//     });
+// };
 
 const fetchChatroomWithFriendsList = async (token: string) => {
     try {
@@ -211,6 +264,25 @@ const fetchChatroomWithFriendsList = async (token: string) => {
         throw error;
     }
 }
+
+const fetchMessages = async (chatroomId: string, token: string, limit = 50, before?: string) => {
+  try {
+    const params: any = { limit };
+    if (before) params.before = before;
+
+    const response = await axios.get(`/chatrooms/${chatroomId}/messages`, {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      },
+      params
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching messages:", error);
+    return [];
+  }
+};
 
 const fetchInvitationList = async (token: string) => {
     try {
@@ -286,7 +358,7 @@ onMounted(async () => {
         user.value = await fetchUserInfo(token);
         chatroomWithFriends.value = await fetchChatroomWithFriendsList(token);
         console.log("ChatroomWithFriend:", chatroomWithFriends.value)
-        conversations.value = createConversations(chatroomWithFriends.value, user.value?.id);
+        conversations.value = await createConversations(chatroomWithFriends.value, user.value?.id, token);
         const invits = await fetchInvitationList(token);
         invitations.value = createInvitations(invits);
 
@@ -457,12 +529,30 @@ const onFileUpload = async (event: Event) => {
  * Select conversation from inbox list
  * @param convo - Conversation to be selected
  */
-const selectConversation = (convo: Conversation) => {
+const selectConversation = async (convo: Conversation) => {
     
     activeConversation.value = convo
     if (activeConversation.value) {
         console.log(" join room:", activeConversation.value.uuid);
         socket.emit('join_room', activeConversation.value.uuid)
+
+        // 從後端拉歷史訊息
+        if (token) {
+          const messages = await fetchMessages(activeConversation.value.uuid, token);
+          console.log("Fetched messages:", messages);
+          console.log("Current user:", currentUser.value);
+
+          activeConversation.value.dialogs = messages.map((msg: ChatDialog) => {
+            console.log("msg.user:", msg.user);
+            console.log("Compare msg.user?.id vs currentUser.id:", msg.user?.id, currentUser.value?.id);
+                  
+            return {
+              ...msg,
+              isSentByViewer: msg.user?.id === currentUser.value?.id
+            };
+          });
+
+        }
     }
 }
 

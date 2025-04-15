@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from datetime import datetime
 from pydantic import Field
 import uuid
+from typing import Optional
 
 class Token(BaseModel):
     access_token: str
@@ -84,8 +85,8 @@ class ReadStatus(str, Enum):
     delivered = 'delivered'
 
 class Message(BaseModel):
-    chatroom_id: bytes
-    sender_id: int
+    chatroom_id: str
+    user: Optional[dict] = None
     content:  str | None = None
     message_type: MessageType
     media_url:  str | None = None
