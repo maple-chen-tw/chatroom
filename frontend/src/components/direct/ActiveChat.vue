@@ -78,8 +78,21 @@ defineEmits([
     "onChatBack",
 ])
 
+
+const convertToLocalDate = (timestamp: string) => {
+  const date = new Date(timestamp);
+  return date.toLocaleDateString('zh-TW', {  
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  });
+};
+
+
+
 const formatedDate = (date: string | undefined) => {
     if (!date) return ''
-	return new Date(date).toLocaleDateString()
+	return convertToLocalDate(date)
+    //return new Date(date).toLocaleDateString()
 }
 </script>

@@ -179,17 +179,7 @@ const fetchFriendsList = async (token: string) => {
     }
 };
 
-const getTimeSince = (timestamp: string) => {
-  const now = new Date();
-  const messageTime = new Date(timestamp);
-  const diff = Math.floor((now.getTime() - messageTime.getTime()) / 1000); // in seconds
 
-  if (diff < 60) return `${diff}s ago`;
-  if (diff < 3600) return `${Math.floor(diff / 60)} mins ago`;
-  if (diff < 86400) return `${Math.floor(diff / 3600)} hrs ago`;
-
-  return `${Math.floor(diff / 86400)} days ago`;
-};
 
 const createConversations = async (chatroomWithFriends: ChatroomWithFriend[], user_id: string, token: string) => {
   const convoPromises = chatroomWithFriends.map(async (friend) => {
@@ -209,7 +199,7 @@ const createConversations = async (chatroomWithFriends: ChatroomWithFriend[], us
       if (response.data.length > 0) {
         const msg = response.data[0];
         lastMessage = msg.content || '[No text]';
-        timeSinceLastMessage = getTimeSince(msg.timestamp);
+        timeSinceLastMessage = msg.timestamp;
       }
     } catch (error) {
       console.error(`Failed to fetch last message for chatroom ${friend.chatroom_id}`, error);
