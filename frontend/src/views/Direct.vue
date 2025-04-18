@@ -505,9 +505,9 @@ const onFileUpload = async (event: Event) => {
 
         chatMessage.value = {
             user: currentUser,
-            itemType: 'image',
+            message_type: 'image',
             isSentByViewer: true,
-            img: attachmentImage.value as string,
+            content: attachmentImage.value as string,
             timestamp: getCurrentTimestamp()
         }
     }

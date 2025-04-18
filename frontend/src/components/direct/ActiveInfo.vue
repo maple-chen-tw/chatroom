@@ -11,8 +11,31 @@
                 <div class="flex items-center space-x-3">
                     <div>
 	            	    <img 
-	            	      	:src="currentUser?.profilePictureUrl"
-	            	      	class="cursor-pointer rounded-full shadow-lg max-w-[150px] h-auto"/>
+	            	      	:src="previewImage || currentUser?.profilePictureUrl"
+	            	      	class="cursor-pointer rounded-full shadow-lg max-w-[150px] h-auto"
+                            alt="頭像預覽"/>
+                              <input 
+                                type="file" 
+                                accept="image/*"
+                                @change="handleImageUpload"
+                                class="mt-2 text-white text-xs"
+                            />
+
+                            <button 
+                                v-if="selectedImage" 
+                                @click="uploadAvatarToServer"
+                                class="mt-1 text-white text-xs sm:text-sm hover:bg-slate-700 p-1 rounded"
+                            >
+                                上傳頭像
+                            </button>
+                            <button 
+                                v-if="selectedImage" 
+                                @click="cancelUpload"
+                                class="mt-1 ml-2 text-red-400 text-xs sm:text-sm hover:bg-slate-800 p-1 rounded"
+                            >
+    取消上傳
+</button>
+
                     </div>
                     <div class="flex flex-col space-y-2">
                         <!-- Username with Edit icon -->
@@ -123,7 +146,6 @@ const saveStatus = async () => {
     emit("updateUser", { ...props.currentUser, status: editedStatus.value });
     isEditingStatus.value = false;
 
-    //console.log("Status updated:", response.data);
   } catch (error) {
     console.error("Error updating status:", error);
   }
@@ -150,12 +172,87 @@ const saveNickname = async () => {
     emit("updateUser", { ...props.currentUser, nickname: editedNickname.value });
     isEditingNickname.value = false;
 
-    //console.log("Nickname updated:", response.data);
   } catch (error) {
     console.error("Error updating Nickname:", error);
   }
 };
 
+
+const selectedImage = ref<File | null>(null);
+const previewImage = ref<string | null>(null);
+
+const MAX_WIDTH = 500; // 限制最大寬度 (像素)
+const MAX_HEIGHT = 500; // 限制最大高度 (像素)
+
+const handleImageUpload = (event: Event) => {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (file) {
+        // 檢查圖片的尺寸
+        const image = new Image();
+        const objectURL = URL.createObjectURL(file);
+
+        image.onload = () => {
+            // 獲取圖片的寬度和高度
+            const width = image.width;
+            const height = image.height;
+
+            // 判斷圖片是否超過最大寬度和高度
+            if (width > MAX_WIDTH || height > MAX_HEIGHT) {
+                alert(`圖片大小限制為最大 ${MAX_WIDTH}x${MAX_HEIGHT} 像素，請選擇一張更小的圖片。`);
+                selectedImage.value = null;
+                previewImage.value = null;
+                return;
+            }
+
+            // 圖片尺寸符合限制，更新預覽和檔案
+            selectedImage.value = file;
+            previewImage.value = objectURL;
+        };
+
+        image.src = objectURL;
+    }
+};
+
+// 上傳到後端，並更新資料庫
+const uploadAvatarToServer = async () => {
+  if (!selectedImage.value) return;
+
+  const formData = new FormData();
+  formData.append("file", selectedImage.value);
+
+  try {
+    // 1. 上傳圖片取得 URL
+    const uploadResponse = await axios.post("/upload/upload-avatar", formData);
+    const imageUrl = uploadResponse.data.url;
+
+    // 2. 更新使用者 avatar_url 到資料庫
+    const patchResponse = await axios.patch(`/user/${props.currentUser.id}`, {
+      avatar_url: imageUrl
+    }, {
+      headers: {
+        "Authorization": `Bearer ${localStorage.getItem("auth-token")}`
+      }
+    });
+
+    // 3. 更新前端畫面
+    emit("updateUser", {
+      ...props.currentUser,
+      profilePictureUrl: imageUrl
+    });
+
+    selectedImage.value = null;
+    previewImage.value = null;
+
+    console.log("上傳成功", imageUrl);
+  } catch (error) {
+    console.error("上傳或更新失敗", error);
+  }
+};
+
+const cancelUpload = () => {
+    selectedImage.value = null;
+    previewImage.value = null;
+};
 
 // Services
 const router = useRouter() 
