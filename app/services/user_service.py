@@ -6,9 +6,9 @@ from app.models import dto
 from typing import Optional
 
 
-def create(username:str, password: str) -> User:
+def create(username:str, password: str, email: str) -> User:
     hashed_password = jwt_service.get_password_hash(password)
-    return user_repo.add(username, hashed_password)
+    return user_repo.add(username, hashed_password, email)
 
 def get(limit: int, offset: int) -> list[User]:
     return user_repo.get(limit=limit, offset=offset)

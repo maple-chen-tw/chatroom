@@ -30,10 +30,18 @@ async def upload_avatar(request: Request, file: UploadFile = File(...)):
     base_url = str(request.base_url)
     return {"url": f"{base_url}static/avatars/{file_name}"}
 
-@router.post("/upload-message-image")
+@router.post("/upload-message-file")
 async def upload_chatroom(request: Request, file: UploadFile = File(...)):
     # 允許的副檔名
-    allowed_extensions = ["image/jpeg", "image/png", "image/webp"]
+    allowed_extensions = {
+        "image/jpeg": "image",
+        "image/png": "image",
+        "image/webp": "image",
+        "audio/mpeg": "audio",
+        "audio/mp3": "audio",
+        "application/pdf": "file",
+        "video/mp4": "video"
+    }
     if file.content_type not in allowed_extensions:
         raise HTTPException(status_code=400, detail="Unsupported file type")
 
@@ -50,4 +58,10 @@ async def upload_chatroom(request: Request, file: UploadFile = File(...)):
 
     # 5. 回傳可公開存取的 URL
     base_url = str(request.base_url)
-    return {"url": f"{base_url}static/message/{file_name}"}
+    file_type = allowed_extensions[file.content_type]
+    file_url = f"{base_url}static/message/{file_name}"
+    
+    return {
+        "url": file_url,
+        "message_type": file_type
+    }

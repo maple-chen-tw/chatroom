@@ -25,6 +25,12 @@ async def register(user: dto.CreateUser):
             detail="Password can not be empty",
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY
         )
+    if not user.email:
+        raise HTTPException(
+            detail="Email can not be empty",
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY
+        )
+    
     exist_user = user_service.get_by_username(user.username)
     if exist_user:
         raise HTTPException(
@@ -33,7 +39,8 @@ async def register(user: dto.CreateUser):
         )
     return user_service.create(
         user.username,
-        user.password
+        user.password,
+        user.email
     )
     
 # login

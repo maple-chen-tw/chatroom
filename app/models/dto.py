@@ -39,6 +39,7 @@ class GetUser(BaseModel):
 class CreateUser(BaseModel):
     username: str
     password: str = Field(..., min_length=4)
+    email: str
 
 class UpdateUser(BaseModel):
     nickname: str | None = None 

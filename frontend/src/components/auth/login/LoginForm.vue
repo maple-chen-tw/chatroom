@@ -23,7 +23,7 @@
 				<div class="mb-2">
 					<TheInput
 						v-model="loginForm.username" 
-						placeholder="Username, or email" 
+						placeholder="Username" 
 						:class="{
 							'border-red-400': v$.username.$dirty && v$.username.$invalid 
 						}"
@@ -70,15 +70,17 @@
 						Log in
 					</div>
 				</TheButton>
-			
+				
 				<!-- OR Dialog -->
+				<!--
 				<fieldset class="border-t border-slate-300 m-4">
 					<legend class="mx-auto px-4 text-gray-500 text-xs font-sans">
 						OR
 					</legend>
 				</fieldset>
-
+				-->
 				<!-- Link: Reset password -->
+				<!--
 				<div class="mt-3 self-center">
 					<router-link 
 						to="reset"
@@ -86,6 +88,7 @@
 						Forgot password?
 					</router-link>
 				</div>
+				-->
 			</form>
 
 			<LoginFooter />

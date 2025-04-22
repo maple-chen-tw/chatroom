@@ -18,7 +18,7 @@
             </i>
         </div>
 
-        <div class="flex flex-col max-h-full overflow-auto">
+        <div class="flex flex-col max-h-full overflow-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-transparent">
             <ChatMessage
                 v-if="activeConversation"
                 :is-chat-loading="isChatLoading"

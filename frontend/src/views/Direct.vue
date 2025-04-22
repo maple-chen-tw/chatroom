@@ -486,31 +486,88 @@ const addToChat = (message: ChatDialog) => {
     }
 }
 
+ /**
+ * 判斷檔案對應的 message_type
+ */
+ const getMessageTypeFromFile = (file: File): 'image' | 'video' | 'audio' | 'file' => {
+    const type = file.type
+
+    if (type.startsWith('image/')) {
+        return 'image'
+    } else if (type.startsWith('video/')) {
+        return 'video'
+    } else if (type.startsWith('audio/')) {
+        return 'audio'
+    } else {
+        return 'file'
+    }
+}
+
 /**
- * TODO: Add validation
- * Handle file uploaded event
+ * 處理檔案上傳事件
+ * - 檢查檔案格式與大小
+ * - 讀取檔案並轉成 Base64 預覽
+ * - 建立聊天訊息物件
  * @param {Object} event - The event object
  */
+
+
 const onFileUpload = async (event: Event) => {
     const targetEvent = event.target as HTMLInputElement
-    const file = targetEvent?.files?.item(0) as Blob
+    const file = targetEvent?.files?.item(0) as File
 
-    // Read the file as data URL to show preview
+    if (!file) return
+
+    // 檔案格式與大小驗證
+    const allowedTypes = [
+        'image/jpeg',
+        'image/png',
+        'image/gif',
+        'video/mp4',
+        'audio/mpeg',
+        'audio/mp3',
+        'application/pdf'
+    ]
+    if (!allowedTypes.includes(file.type)) {
+        isFileValid.value = false
+        alert('只支援上傳圖片、影片、音訊 或 PDF 文件喔～')
+        return
+    }
+    const maxSizeInMB = 10
+    const fileSizeInMB = file.size / (1024 * 1024)
+    if (fileSizeInMB > maxSizeInMB) {
+        isFileValid.value = false
+        alert(`檔案太大囉～請上傳小於 ${maxSizeInMB}MB 的檔案`)
+        return
+    }
+
+    // 前端即時預覽(Base64)
     const reader = new FileReader()
     reader.readAsDataURL(file)
-    reader.onload = (event) => {
+    reader.onload = async (event) => {
         attachmentImage.value = event.target?.result as string
         isFileValid.value = true
         isFileUploaded.value = true
 
-        chatMessage.value = {
-            user: currentUser,
-            message_type: 'image',
-            isSentByViewer: true,
-            content: attachmentImage.value as string,
-            timestamp: getCurrentTimestamp()
+        const formData = new FormData()
+        formData.append('file', file)
+        try {
+            const { data } = await axios.post('/upload/upload-message-file', formData)
+
+            chatMessage.value = {
+                user: currentUser,
+                message_type: data.message_type,
+                chatroom_id:activeConversation.value?.uuid,
+                isSentByViewer: true,
+                content: data.url,
+                timestamp: getCurrentTimestamp()
+            }
+        } catch (err) {
+            console.error(err)
+            alert('檔案上傳失敗，請稍後再試')
         }
     }
+
 }
 
 
@@ -533,8 +590,8 @@ const selectConversation = async (convo: Conversation) => {
           console.log("Current user:", currentUser.value);
 
           activeConversation.value.dialogs = messages.map((msg: ChatDialog) => {
-            console.log("msg.user:", msg.user);
-            console.log("Compare msg.user?.id vs currentUser.id:", msg.user?.id, currentUser.value?.id);
+            // console.log("msg.user:", msg.user);
+            // console.log("Compare msg.user?.id vs currentUser.id:", msg.user?.id, currentUser.value?.id);
                   
             return {
               ...msg,

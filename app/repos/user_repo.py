@@ -4,11 +4,12 @@ from sqlalchemy import func
 from app.models.db import User
 from app.db.context import session_maker
 
-def add(username: str, hashed_password: str)-> User:
+def add(username: str, hashed_password: str, email: str)-> User:
     with session_maker.begin() as session:
         user = User()
         user.username = username
         user.hashed_password = hashed_password
+        user.email = email
         session.add(user)
         session.flush()
         #session.commit()

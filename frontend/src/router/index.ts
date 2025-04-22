@@ -8,7 +8,7 @@ import {
 } from '@/stores'
 import NProgress from 'nprogress'
 
-const ROOT_ROUTE = '/home'
+const ROOT_ROUTE = '/direct'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -19,12 +19,16 @@ const router = createRouter({
       component: () => import('@/layouts/LayoutMain.vue'),
       children: [
         {
-          path: '/',
-          alias: '/home',
-          name: 'home',
-          component: () => import('@/views/Home.vue'),
-          meta: {}
+          path: '',
+          redirect: '/accounts/login'
         },
+        //{
+        //  path: '/',
+        //  alias: '/home',
+        //  name: 'home',
+        //  component: () => import('@/views/Home.vue'),
+        //  meta: {}
+        //},
         //{
         //  path: '/explore',
         //  name: 'explore',
@@ -61,24 +65,24 @@ const router = createRouter({
         //  component: () => import('@/views/Search.vue'),
         //  meta: {}
         //},
-        {
-          path: '/notifications',
-          name: 'notifications',
-          component: () => import('@/views/Notification.vue'),
-          meta: {}
-        },
-        {
-          path: '/settings',
-          name: 'settings',
-          component: () => import('@/views/Setting.vue'),
-          meta: {}
-        },
-        {
-          path: '/p/:id?',
-          name: 'post',
-          component: () => import('@/views/Post.vue'),
-          meta: {}
-        },
+        //{
+        //  path: '/notifications',
+        //  name: 'notifications',
+        //  component: () => import('@/views/Notification.vue'),
+        //  meta: {}
+        //},
+        //{
+        //  path: '/settings',
+        //  name: 'settings',
+        //  component: () => import('@/views/Setting.vue'),
+        //  meta: {}
+        //},
+        //{
+        //  path: '/p/:id?',
+        //  name: 'post',
+        //  component: () => import('@/views/Post.vue'),
+        //  meta: {}
+        //},
         //{
         //  path: '/create',
         //  name: 'create',
@@ -157,7 +161,7 @@ router.beforeEach(async (to, from, next) => {
 
   // User shouldn't be able to access create route without preview image
   if (to.path.startsWith('/create') && !photoStore.previewImage) {
-    return next({ name: 'home' })
+    return next({ name: 'login' })
   }
 
   // Close any open modals
@@ -171,7 +175,7 @@ router.beforeEach(async (to, from, next) => {
 router.afterEach((to, from, failure) => {
   if (to.meta.title && failure?.from.path !== ROOT_ROUTE) {
     // Only update page title if no failure
-    document.title = `PhotoFlow - ${ to.meta.title }`
+    document.title = `Chat - ${ to.meta.title }`
   }
 
   // Complete the animation of the route progress bar.

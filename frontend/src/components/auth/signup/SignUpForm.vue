@@ -83,6 +83,7 @@
 </template>
 
 <script setup lang="ts">
+import axios from 'axios'
 import {
     ref,
     computed
@@ -158,14 +159,23 @@ const router = useRouter()
 const v$ = useVuelidate(validation, signupForm.value)
 
 // Methods
-const signup = () => {
+const signup = async () => {
     isLoading.value = true
-    setTimeout(() => {
-        // Success toastr
-        // TODO: Replace with actual signup logic
-        toast.success('Success. Redirecting...')
+	try {
+		const response = await axios.post('/auth/register', {
+			email: signupForm.value.email,
+			username: signupForm.value.username,
+			password: signupForm.value.password
+		})
+
+		toast.success('註冊成功！即將跳轉...')
 		router.push({ name: 'direct' })
-        isLoading.value = false
-    }, 1000)
+
+	} catch (error: any) {
+		const msg = error?.response?.data?.detail || '註冊失敗'
+		toast.error(msg)
+	} finally {
+		isLoading.value = false
+	}
 }
 </script>
