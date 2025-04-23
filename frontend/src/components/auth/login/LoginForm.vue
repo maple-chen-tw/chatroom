@@ -1,11 +1,12 @@
 <template>
 	<div class="flex flex-row m-auto space-x-1">
+		<!--
 		<MobileWelcomeScreen 
 			:is-mobile-login="isMobileLogin"
 			@mobile-login="triggerMobileLogin"/>
 		
 		<WelcomeCarousel />
-		
+		-->
 		<div 
 			:class="isMobileLogin ? '' : 'hidden'"
 			class="sm:flex sm:flex-col space-y-3 m-8">
