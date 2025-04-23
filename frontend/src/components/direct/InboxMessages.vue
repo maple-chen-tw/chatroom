@@ -63,19 +63,6 @@ const emitSelectConversation = (conversation: Conversation) => {
     emit('onSelectConversation', conversation)
 }
 
-const getTimeSince = (timestamp: string) => {
-  const now = new Date();
-  const messageTime = new Date(timestamp);
-  const diff = Math.floor((now.getTime() - messageTime.getTime()) / 1000); // in seconds
-
-  if (diff < 60) return `Just now`; // 當差距不到 1 分鐘時
-  if (diff < 3600) return `${Math.floor(diff / 60)} mins ago`; // 當差距不到 1 小時時
-  if (diff < 86400) return `${Math.floor(diff / 3600)} hrs ago`; // 當差距不到 1 天時
-  if (diff < 2592000) return `${Math.floor(diff / 86400)} days ago`; // 當差距不到 30 天時
-  if (diff < 31536000) return `${Math.floor(diff / 2592000)} months ago`; // 當差距不到 1 年時
-  return `${Math.floor(diff / 31536000)} years ago`; // 超過 1 年
-};
-
 const formatedDate = (date: string) => {
 	if (!date) return ''
 	//return getTimeSince(date)
