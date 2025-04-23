@@ -110,13 +110,6 @@ import {
     getCurrentTimestamp
 } from '@/common/helpers'
 
-// Demo data
-import {
-    ChatDialogSample,
-    ConversationSample, 
-    UserSample,
-    InvitationSample
-} from '@/data'
 
 import { 
 	useRouter 

@@ -1,8 +1,3 @@
 export * from "./core"
 export * from "./direct"
-// export * from "./search"
-// export * from "./profile"
-// export * from "./setting"
-// export * from "./notifications"
 export * from "./auth"
-// export * from "./story/Index"
