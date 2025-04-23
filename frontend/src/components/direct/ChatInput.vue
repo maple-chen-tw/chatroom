@@ -34,11 +34,12 @@
 			@click="emitFileUpload">
 			<SVGLoader
 				:icon="'gallery'" 
-				:class="'cursor-pointer md:absolute inset-y-0 right-20 \
+				:class="'cursor-pointer md:absolute inset-y-0 right-12 \
                     flex items-center'" /> 
 		</div>
 
 		<!-- Like/Heart -->
+		 <!--
 		<div
 			class="self-center"
 			:class="{ 'hidden': !isChatEmpty }"
@@ -48,6 +49,7 @@
 				:class="'cursor-pointer md:absolute inset-y-0 right-12 \
                     flex items-center'" />     
 		</div>
+		-->
 	</div>
 </template>
 

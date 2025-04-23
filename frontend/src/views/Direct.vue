@@ -215,24 +215,6 @@ const createConversations = async (chatroomWithFriends: ChatroomWithFriend[], us
 
   return await Promise.all(convoPromises);
 };
-// const createConversations = async (chatroomWithFriends: ChatroomWithFriend[], user_id: string) => {
-// 
-//     return chatroomWithFriends.map(friend => {
-//         return {
-//             uuid: friend.chatroom_id,
-//             user: {
-//                 id: friend.user_id,
-//                 userName: friend.username,
-//                 nickname: friend.nickname || null,
-//                 profilePictureUrl: friend.avatar_url
-//             },
-//             lastMessage: 'No messages yet',
-//             timeSinceLastMessage: '0 mins ago',
-//             dialogs: [],
-//             isActive: true
-//         };
-//     });
-// };
 
 const fetchChatroomWithFriendsList = async (token: string) => {
     try {
@@ -373,7 +355,10 @@ onMounted(async () => {
           messageData.isSentByViewer = isSentByViewer;
           if(isSentByViewer === false){
             activeConversation.value.dialogs.push(messageData);
+            
           };
+          updateConversationPreview(messageData);
+          
 
       }
     } catch (error) {
@@ -400,6 +385,32 @@ const updatedConversations = (newConversations: Conversation[]) => {
 const updatedInvitations = (newInvitations: Invitation[]) => {
   invitations.value = newInvitations
 }
+
+const updateConversationPreview = (messageData: ChatDialog) => {
+  const chatroomId = messageData.chatroom_id;
+  const targetIndex = conversations.value.findIndex((c: Conversation) => c.uuid === chatroomId);
+
+  if (targetIndex !== -1) {
+    const old = conversations.value[targetIndex];
+
+    const updated = {
+      ...old,
+      lastMessage: messageData.content || '[No text]',
+      timeSinceLastMessage: new Date(messageData.timestamp).toLocaleString('zh-TW', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      })
+    };
+
+    conversations.value.splice(targetIndex, 1, updated); 
+  }
+};
+
+
 
 // References to DOM element
 const fileUpload = ref<HTMLInputElementRef | null>()
@@ -579,8 +590,8 @@ const selectConversation = async (convo: Conversation) => {
         // 從後端拉歷史訊息
         if (token) {
           const messages = await fetchMessages(activeConversation.value.uuid, token);
-          console.log("Fetched messages:", messages);
-          console.log("Current user:", currentUser.value);
+          // console.log("Fetched messages:", messages);
+          // console.log("Current user:", currentUser.value);
 
           activeConversation.value.dialogs = messages.map((msg: ChatDialog) => {
             // console.log("msg.user:", msg.user);
