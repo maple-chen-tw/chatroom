@@ -16,8 +16,8 @@
 				<!-- Icon -->
 				<div class="self-center mb-2">
 				<img 
-					class="w-38 h-10"
-					src="@/assets/images/icon-light.png" />
+					class="w-35 h-25"
+					src="@/assets/images/404chat.png" />
 				</div>
 
 				<!-- Input: Email -->
