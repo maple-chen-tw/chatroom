@@ -68,7 +68,7 @@
 					</i>
 
 					<div v-else>
-						Log in
+						登入
 					</div>
 				</TheButton>
 				

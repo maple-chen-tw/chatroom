@@ -154,25 +154,25 @@ const searchFriend = () => {
       return f.user.id === friend.user_id;
     });
     if (isAlreadyFriend) {
-      searchMessage.value = '該使用者已經是您的好友!';
+      searchMessage.value = '你們早就是好友啦～快去聊天吧!';
       return;
     }
     // 3. 如果已經發送過好友邀請，顯示已經發送過
     const isRequestAlreadySent = await checkIfRequestSent(friend);
     if (isRequestAlreadySent) {
-      searchMessage.value = '好友邀請已經發送過了!';
+      searchMessage.value = '邀請已經送過囉～等對方回應中!';
       return;
     }
     // 4. 如果不是好友，發送好友邀請
     await sendFriendRequest(friend);
-    searchMessage.value = `已發送好友邀請給 ${friend.username}！`;
+    searchMessage.value = `已發送好友邀請給 ${friend.username}!`;
 
   })
   .catch(error => {
     if (error.response && error.response.status == 404) {
-      searchMessage.value = '找不到該使用者!';
+      searchMessage.value = '找不到這個人，是不是打錯啦~';
     } else {
-      searchMessage.value = '搜尋時發生錯誤，請稍後再試!';
+      searchMessage.value = '搜尋出了點小差錯，請稍後再試!';
     }
 
   });

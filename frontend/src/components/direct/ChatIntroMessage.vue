@@ -7,11 +7,12 @@
                 src="@/assets/images/404chat_white.png" style="width:50%;display:block;margin:auto;"/>
 
             <div class="text-white md:text-xl text-xs pt-3 ">
-                Your messages
+                朋友 404 Not Found？
             </div>
 
             <div class="text-[#a8a8a8] lg:text-sm text-xs pb-3">
-                Send private photos and messages to a friend or group.
+                聊天要緣分，朋友要自己加，<br>
+                緣分還沒來？那就主動一點，去找人聊聊吧～ 
             </div>
 
         </div>

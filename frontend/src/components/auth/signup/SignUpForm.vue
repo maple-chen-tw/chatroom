@@ -74,7 +74,7 @@
 			</i>
 
 			<div v-else>
-				Sign Up
+				註冊
 			</div>
 		</TheButton>
 
