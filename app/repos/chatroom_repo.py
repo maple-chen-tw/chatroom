@@ -2,6 +2,7 @@ from app.models.db import Chatroom, Participant, Message, User
 from app.db.context import session_maker
 from app.models import dto
 from datetime import datetime
+from sqlalchemy import select, func
 import uuid
 
 def get_chatrooms(user_id: int):
@@ -50,15 +51,33 @@ def get_chatroom(chatroom_id: int):
         ).first()
 
 def add_chatroom(members_id: list[int], chatroom_name: str = None):
+    user1, user2 = members_id
     with session_maker() as session:
         try:
+            # 1. 檢查這兩位使用者是否已經有共同聊天室
+            subquery = (
+                session.query(Participant.chatroom_id)
+                .filter(Participant.user_id.in_([user1, user2]))
+                .group_by(Participant.chatroom_id)
+                .having(func.count(Participant.user_id) == 2)
+            )
+
+            existing_chatroom_id = subquery.first()
+            if existing_chatroom_id:
+                # 已經有聊天室，回傳它的 ID
+                return str(uuid.UUID(bytes=existing_chatroom_id[0]))
+
+            # 2. 沒有的話才新增聊天室
             new_chatroom = Chatroom(chatroom_name=chatroom_name)
             session.add(new_chatroom)
             session.commit()
 
             chatroom_id = new_chatroom.chatroom_id
 
-            participants = [Participant(chatroom_id=chatroom_id, user_id=user_id) for user_id in members_id]
+            participants = [
+                Participant(chatroom_id=chatroom_id, user_id=user_id)
+                for user_id in members_id
+            ]
             session.add_all(participants)
             session.commit()
 

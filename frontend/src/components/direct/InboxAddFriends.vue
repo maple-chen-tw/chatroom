@@ -17,6 +17,23 @@
   {{ searchMessage }}
   </div>
 
+  <!-- 顯示搜尋到的好友 -->
+  <div v-if="foundFriend" class="p-4 mt-2 rounded-md bg-slate-800 text-white">
+    <div class="flex items-center space-x-4">
+      <img :src="foundFriend.avatar_url" class="h-12 w-12 rounded-full shadow-md" />
+      <div>
+        <div class="font-bold">{{ foundFriend.nickname || foundFriend.username }}</div>
+        <div class="text-sm text-gray-300">帳號：{{ foundFriend.username }}</div>
+      </div>
+    </div>
+    <div class="mt-3 flex justify-end space-x-2">
+      <button @click="confirmAddFriend" class="text-sm text-sky-400 hover:text-sky-600">加為好友</button>
+      <button @click="foundFriend = null" class="text-sm text-gray-400 hover:text-gray-600">取消</button>
+    </div>
+  </div>
+
+
+
   <div class="flex flex-col pl-2 pr-2 text-white font-bold">
     待確認好友邀請
   </div>
@@ -109,7 +126,7 @@ if (!token) {
 }
 
 const userId = ref<string | null>(null);
-
+const foundFriend = ref<Friend | null>(null);
 
 if (token) {
   try {
@@ -164,8 +181,10 @@ const searchFriend = () => {
       return;
     }
     // 4. 如果不是好友，發送好友邀請
-    await sendFriendRequest(friend);
-    searchMessage.value = `已發送好友邀請給 ${friend.username}!`;
+    foundFriend.value = friend;
+    searchMessage.value = '';
+    // await sendFriendRequest(friend);
+    // searchMessage.value = `已發送好友邀請給 ${friend.username}!`;
 
   })
   .catch(error => {
@@ -255,12 +274,14 @@ const sendFriendRequest = async (friend: Friend) => {
       // Update conversations list by adding the accepted user
       if (Array.isArray(props.conversations)) {
         if (userId.value){
-          createFriendChatroom(userId.value, invit);
+          const newConversation = await createFriendChatroom(userId.value, invit);
+          if (newConversation && Array.isArray(props.conversations)) {
+            const updatedConversations = [...props.conversations, newConversation];
+            emit('update-conversations', updatedConversations);
+          }
         } else {
         console.log('User ID is not available');
         }
-        const updatedConversations = [...props.conversations, { user: invit.user }];
-        emit('update-conversations', updatedConversations);
       }
 
       // Remove the accepted invitation from the invitations list
@@ -300,8 +321,24 @@ const createFriendChatroom = async(user_id: string, invit: Invitation) => {
         'Content-Type': 'application/json',
       },
     });
+    const data = response.data;
+    console.log("Chatroom created:", data);
+    
+    const conversation = {
+      uuid: data.chatroom_id,
+      user: {
+        id: invit.user.id,
+        userName: invit.user.userName,
+        nickname: invit.user.nickname || null,
+        profilePictureUrl: invit.user.profilePictureUrl,
+      },
+      lastMessage: null,
+      timeSinceLastMessage: null,
+      dialogs: [],
+      isActive: true,
+    };
 
-    console.log("Chatroom created:", response.data);
+    return conversation;
 
   } catch (error) {
     if (error instanceof AxiosError) {
@@ -343,7 +380,19 @@ const createFriendChatroom = async(user_id: string, invit: Invitation) => {
   }
 }
 
+const confirmAddFriend = async () => {
+  if (!foundFriend.value) return;
 
+  const isRequestAlreadySent = await checkIfRequestSent(foundFriend.value);
+  if (isRequestAlreadySent) {
+    searchMessage.value = '邀請已經送過囉～等對方回應中!';
+    return;
+  }
+
+  await sendFriendRequest(foundFriend.value);
+  searchMessage.value = `已發送好友邀請給 ${foundFriend.value.username}！`;
+  foundFriend.value = null;
+}
 
 
 
