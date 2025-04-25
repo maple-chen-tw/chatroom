@@ -57,11 +57,11 @@ def reject_request(friend_id: int, user: dependencies.user_dependency) -> None:
     friend_service.reject_request(user.user_id, friend_id)
 
 @router.get("/search", response_model = dto.Friend)
-def get_search_by_username(username: str, user: dependencies.user_dependency)-> db.User | None:
+def get_search_by_email(email: str, user: dependencies.user_dependency)-> db.User | None:
 
-    user = friend_service.get_search_by_username(username)
+    user = friend_service.get_search_by_email(email)
     if user is None:
-        raise HTTPException(status_code=404, detail="User with username not found")
+        raise HTTPException(status_code=404, detail="User with email not found")
     
     return dto.Friend(
         user_id=user.user_id,

@@ -14,8 +14,8 @@ def get_sent_requests(user_id: int) -> list[User]:
 def get_received_requests(user_id: int) ->list[User]:
     return friend_repo.get_received_requests(user_id)
 
-def get_search_by_username(username: str) -> User | None:
-    return friend_repo.get_search_by_username(username)
+def get_search_by_email(email: str) -> User | None:
+    return friend_repo.get_search_by_email(email)
 
 def accept_request(user_id: int, friend_id: int)-> None:
     return friend_repo.accept_request(user_id, friend_id)

@@ -96,7 +96,7 @@ def accept_request(user_id: int, friend_id: int) -> None:
 
 
 
-def get_search_by_username(username: str) -> User | None:
+def get_search_by_email(email: str) -> User | None:
     with session_maker.begin() as session:
         result =  session.query(
             User.user_id,
@@ -104,7 +104,7 @@ def get_search_by_username(username: str) -> User | None:
             User.nickname,
             User.avatar_url
         ).where(
-            User.username == username          
+            User.email == email          
         ).first()
     return result
 

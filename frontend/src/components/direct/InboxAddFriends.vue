@@ -134,7 +134,7 @@ const searchFriend = () => {
                 "Authorization":`Bearer ${token}`
             },
     params: {
-      username:searchQuery.value
+      email:searchQuery.value
     }
   })
   .then(async response => {
