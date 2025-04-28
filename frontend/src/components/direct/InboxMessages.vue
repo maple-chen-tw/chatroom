@@ -5,7 +5,7 @@
 		:key="index"
 		class="flex flex-col md:block pl-2 pr-2"
 		@click="emitSelectConversation(convo)">
-		<div 
+		<div v-if="convo.lastMessage"
 			:class="{ 'bg-slate-1100': convo.uuid === activeConversationId }"
 			class="flex p-3 space-x-3 sm:hover:bg-slate-1100 w-full cursor-pointer">
 			<!-- Profile Image -->
