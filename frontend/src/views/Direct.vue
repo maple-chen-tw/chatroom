@@ -14,6 +14,7 @@
                   :activeConversation=null
                   :current-user="user"
                   @on-select-conversation="selectConversation"
+
                 />
 
                 <InboxPanel
@@ -25,6 +26,7 @@
                   :current-user="user"
                   @update-invitations="updatedInvitations"
                   @update-conversations="updatedConversations"
+                  @update-chatrooms="updateChatrooms"
                 />
               
                 <InboxPanel
@@ -176,7 +178,7 @@ const fetchFriendsList = async (token: string) => {
 
 const createConversations = async (chatroomWithFriends: ChatroomWithFriend[], user_id: string, token: string) => {
   const convoPromises = chatroomWithFriends.map(async (friend) => {
-    let lastMessage = 'No messages yet';
+    let lastMessage = '';
     let timeSinceLastMessage = '';
 
     try {
@@ -410,6 +412,21 @@ const updateConversationPreview = (messageData: ChatDialog) => {
   }
 };
 
+const updateChatrooms = async () => {
+
+    console.log("emit update-chatrooms in Direct");
+
+    try {
+        if (!token) {
+      console.warn("Token is null, cannot fetch chatrooms.");
+      return;
+    }
+        const updatedChatrooms = await fetchChatroomWithFriendsList(token);
+        chatroomWithFriends.value = updatedChatrooms;
+    } catch (error) {
+        console.error("Error updating chatrooms:", error);
+    }
+}
 
 
 // References to DOM element

@@ -16,6 +16,7 @@
                 :conversations="conversations"
                 @update-invitations="updatedInvitations"
                 @update-conversations="updatedConversations"
+                @update-chatrooms="updatedChatrooms"
                 />
             </div>
             <div v-else-if="activePanel === 'user'">
@@ -85,13 +86,22 @@ const props = defineProps({
     }
 })
 
-const emit = defineEmits(['onSelectConversation', 'update-invitations', 'update-conversations'])
+const emit = defineEmits([
+    'onSelectConversation', 
+    'update-invitations', 
+    'update-conversations', 
+    'update-chatrooms'])
 const updatedInvitations = (newInvitations: Invitation[]) => {
     emit('update-invitations', newInvitations)
 }
 
 const updatedConversations = (newConversations: Conversation[]) => {
     emit('update-conversations', newConversations)
+}
+
+const updatedChatrooms = () => {
+    emit('update-chatrooms');
+    console.log("emit update-chatrooms in Direct");
 }
 
 </script>

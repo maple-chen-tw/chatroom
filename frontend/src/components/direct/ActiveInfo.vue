@@ -11,7 +11,7 @@
                 <div class="flex items-center space-x-3">
                     <div>
 	            	    <img 
-	            	      	:src="previewImage || currentUser?.profilePictureUrl"
+	            	      	:src="previewImage || currentUser?.profilePictureUrl || defaultAvatar"
 	            	      	class="cursor-pointer rounded-full shadow-lg max-w-[150px] h-auto"
                             alt="頭像預覽"/>
                               <input 
@@ -96,6 +96,9 @@
 
 
 <script setup lang="ts">
+
+import defaultAvatar from '@/assets/images/404ghost.png';
+
 import { 
     useRouter
 } from 'vue-router'

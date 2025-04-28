@@ -12,14 +12,14 @@
 
 		<div class="flex space-x-2 items-center">
 			<img 
-				:src="viewer?.profilePictureUrl"
+				:src="viewer?.profilePictureUrl ||defaultAvatar"
 				class="cursor-pointer h-10 w-10 rounded-full shadow-lg" />
 
 			<div class="cursor-pointer font-sans text-sm font-bold text-white pt-1">
 				{{ viewer?.userName }}
 			</div>
 		</div>
-
+		<!--
 		<div 
 			class="flex space-x-4 cursor-pointer md:visible invisible">
 			<SVGLoader 
@@ -32,10 +32,12 @@
 				:icon="'chat-info'"
 				@click="emitChatInfo" />
 		</div>
+		-->
 	</div>
 </template>
 
 <script setup lang="ts">
+import defaultAvatar from '@/assets/images/404ghost.png';
 import {
     SVGLoader
 } from '@/components'

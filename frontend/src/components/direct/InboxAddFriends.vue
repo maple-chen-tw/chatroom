@@ -49,7 +49,7 @@
       <div class="flex items-center space-x-3">
 			  <!-- Profile Image -->
 			  <img 
-			  	:src="invit.user.profilePictureUrl"
+			  	:src="invit.user.profilePictureUrl || defaultAvatar"
 			  	class="cursor-pointer h-14 w-14 rounded-full shadow-lg" />
 
 
@@ -84,6 +84,7 @@
 </template>
 
 <script setup lang="ts">
+import defaultAvatar from '@/assets/images/404ghost.png';
 import type {
   Invitation,
   Conversation,
@@ -114,7 +115,11 @@ const props = defineProps({
 })
 
 
-const emit = defineEmits(['update-invitations', 'update-conversations'])
+const emit = defineEmits([
+  'update-invitations', 
+  'update-conversations',
+  'update-chatrooms'
+])
 
 const router = useRouter()
 const searchQuery = ref('')
@@ -278,6 +283,11 @@ const sendFriendRequest = async (friend: Friend) => {
           if (newConversation && Array.isArray(props.conversations)) {
             const updatedConversations = [...props.conversations, newConversation];
             emit('update-conversations', updatedConversations);
+
+            emit('update-chatrooms');
+
+            console.log("emit update-chatrooms addFriend");
+
           }
         } else {
         console.log('User ID is not available');
@@ -306,6 +316,7 @@ const sendFriendRequest = async (friend: Friend) => {
 /**
  * Create New Chatroom with friend
  */
+
 
 const createFriendChatroom = async(user_id: string, invit: Invitation) => {
   console.log(`create Friend Chatroom for ${invit.user.userName}`)

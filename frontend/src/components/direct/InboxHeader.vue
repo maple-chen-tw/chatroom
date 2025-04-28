@@ -3,7 +3,7 @@
 		<div class="flex p-3 space-x-3 sm:hover:bg-slate-1100 w-full">
 				<!-- Profile Image -->
 				<img 
-					:src="currentUser?.profilePictureUrl"
+					:src="currentUser?.profilePictureUrl || defaultAvatar"
 					class="cursor-pointer h-14 w-14 rounded-full shadow-lg" />
 
 				<div class="flex flex-col self-center space-y-2 pb-3">
@@ -21,6 +21,7 @@
 </template>
 
 <script setup lang="ts">
+import defaultAvatar from '@/assets/images/404ghost.png';
 import { 
     useRouter
 } from 'vue-router'

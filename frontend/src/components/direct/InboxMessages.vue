@@ -10,7 +10,7 @@
 			class="flex p-3 space-x-3 sm:hover:bg-slate-1100 w-full cursor-pointer">
 			<!-- Profile Image -->
 			<img 
-				:src="convo.user.profilePictureUrl"
+				:src="convo.user.profilePictureUrl || defaultAvatar"
 				class="cursor-pointer h-14 w-14 rounded-full shadow-lg" />
 
 
@@ -39,6 +39,7 @@
 </template>
 
 <script setup lang="ts">
+import defaultAvatar from '@/assets/images/404ghost.png';
 import type {
     Conversation
 } from '@/common/models'

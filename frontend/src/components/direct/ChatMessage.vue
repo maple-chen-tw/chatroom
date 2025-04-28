@@ -11,7 +11,7 @@
 		>
 		<img 
 			v-if="!dialog.isSentByViewer"
-			src="https://loremflickr.com/1024/1080/car"
+			:src="dialog.user.profilePictureUrl || defaultAvatar"
 			class="cursor-pointer h-6 w-6 rounded-full shadow-lg self-end" />
 			<!-- TODO: Change to active user img based on user store -->
 
@@ -63,6 +63,7 @@
 </template>
 
 <script setup lang="ts">
+import defaultAvatar from '@/assets/images/404ghost.png';
 import type {
     Conversation
 } from '@/common'
