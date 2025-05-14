@@ -20,7 +20,7 @@
   <!-- 顯示搜尋到的好友 -->
   <div v-if="foundFriend" class="p-4 mt-2 rounded-md bg-slate-800 text-white">
     <div class="flex items-center space-x-4">
-      <img :src="foundFriend.avatar_url" class="h-12 w-12 rounded-full shadow-md" />
+      <img :src="foundFriend.avatar_url || defaultAvatar" class="h-12 w-12 rounded-full shadow-md" />
       <div>
         <div class="font-bold">{{ foundFriend.nickname || foundFriend.username }}</div>
         <div class="text-sm text-gray-300">帳號：{{ foundFriend.username }}</div>
@@ -130,12 +130,12 @@ if (!token) {
   router.push('/auth/login');
 }
 
-const userId = ref<string | null>(null);
+const userId = ref<number | null>(null);
 const foundFriend = ref<Friend | null>(null);
 
 if (token) {
   try {
-    const decodedToken = jwt_decode<{ user_id: string }>(token); 
+    const decodedToken = jwt_decode<{ user_id: number }>(token); 
     userId.value = decodedToken.user_id;
   } catch (error) {
     console.error("Error decoding token:", error);
@@ -318,7 +318,7 @@ const sendFriendRequest = async (friend: Friend) => {
  */
 
 
-const createFriendChatroom = async(user_id: string, invit: Invitation) => {
+const createFriendChatroom = async(user_id: number, invit: Invitation) => {
   console.log(`create Friend Chatroom for ${invit.user.userName}`)
   try {
     const chatroomName = "Default Chatroom";

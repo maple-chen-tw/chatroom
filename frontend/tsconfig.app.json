@@ -1,14 +1,15 @@
 {
-  "extends": "@vue/tsconfig/tsconfig.web.json",
+  "extends": "@vue/tsconfig",
   "include": ["env.d.ts", "src/**/*", "src/**/*.vue", "src/**/*.json"],
   "exclude": ["src/**/__tests__/*"],
   "compilerOptions": {
     "composite": true,
-    "baseUrl": "http://127.0.0.1:8000",
+    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     },
     "esModuleInterop": true,
-    "moduleResolution": "Node"
+    "moduleResolution": "Node",
+    "verbatimModuleSyntax": true
   }
 }

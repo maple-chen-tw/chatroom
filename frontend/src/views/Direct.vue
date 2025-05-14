@@ -9,10 +9,10 @@
                   v-if="activePanel === 'user'"
                   :chatroomWithFriends="chatroomWithFriends"
                   :conversations="conversations"
-                  :invitations=null
+                  :invitations=undefined
                   :active-panel="activePanel"
-                  :activeConversation=null
-                  :current-user="user"
+                  :activeConversation=undefined
+                  :current-user="user!"
                   @on-select-conversation="selectConversation"
 
                 />
@@ -22,8 +22,8 @@
                   :conversations=conversations
                   :invitations="invitations"
                   :active-panel="activePanel"
-                  :activeConversation=null
-                  :current-user="user"
+                  :activeConversation=undefined
+                  :current-user="user!"
                   @update-invitations="updatedInvitations"
                   @update-conversations="updatedConversations"
                   @update-chatrooms="updateChatrooms"
@@ -32,10 +32,10 @@
                 <InboxPanel
                   v-else
                   :conversations="conversations"
-                  :invitations=null
+                  :invitations=undefined
                   :active-panel="activePanel"
-                  :activeConversation=null
-                  :current-user="user"
+                  :activeConversation=undefined
+                  :current-user="user!"
                   @on-select-conversation="selectConversation"
                 />
             
@@ -45,7 +45,7 @@
             <!-- Chat input and Dialogs -->
             <ActiveInfo
                 v-if="activePanel === 'options'"
-                :current-user="user"
+                :current-user="user!"
                 @updateUser="updateUserData"
                 />
             <ActiveChat 
@@ -105,7 +105,8 @@ import type {
     Conversation,
     ChatroomWithFriend,
     Friend,
-    Invitation
+    Invitation,
+    Viewer
 } from '@/common'
 
 import {
@@ -118,10 +119,10 @@ import {
 } from 'vue-router'
 import { onMounted, onUnmounted } from 'vue';
 import axios, { AxiosError } from "axios";
-import { User } from '@/common'
+import type { User } from '@/common'
 
 import io from 'socket.io-client'
-const socket = io("http://localhost:8000", {
+const socket = io(import.meta.env.VITE_SOCKET_URL, {
     path: "/ws/socket.io/",
     transports: ['websocket'],
     autoConnect: true,
@@ -131,7 +132,7 @@ const socket = io("http://localhost:8000", {
 });
 
 const token: string | null = localStorage.getItem('auth-token');
-const user = ref<User | null>(null);
+const user = ref<Viewer | null>(null);
 const chatroomWithFriends = ref<ChatroomWithFriend[]>([]);
 const conversations = ref<Conversation[]>([]);
 const invitations = ref<Invitation[]>([]);
@@ -176,7 +177,7 @@ const fetchFriendsList = async (token: string) => {
 
 
 
-const createConversations = async (chatroomWithFriends: ChatroomWithFriend[], user_id: string, token: string) => {
+const createConversations = async (chatroomWithFriends: ChatroomWithFriend[], user_id: number, token: string) => {
   const convoPromises = chatroomWithFriends.map(async (friend) => {
     let lastMessage = '';
     let timeSinceLastMessage = '';
@@ -205,12 +206,12 @@ const createConversations = async (chatroomWithFriends: ChatroomWithFriend[], us
       user: {
         id: friend.user_id,
         userName: friend.username,
-        nickname: friend.nickname || null,
-        profilePictureUrl: friend.avatar_url,
+        nickname: friend.nickname ?? undefined,
+        profilePictureUrl: friend.avatar_url ?? undefined,
       },
       lastMessage,
       timeSinceLastMessage,
-      dialogs: [],
+      dialogs: [] as ChatDialog[],
       isActive: true,
     };
   });
@@ -272,10 +273,10 @@ const createInvitations = (friends: Friend[]) => {
             user: {
                 id: friend.user_id,
                 userName: friend.username,
-                nickname: friend.nickname || null,
-                profilePictureUrl: friend.avatar_url
+                nickname: friend.nickname ?? undefined,
+                profilePictureUrl: friend.avatar_url ?? undefined,
             },
-            status: 'pending'
+            status: 'pending' as 'pending'
         };
     });
     return newInvitations;
@@ -353,7 +354,7 @@ onMounted(async () => {
         // Check if there's an active conversation and if it has a uuid
         if (activeConversation.value && activeConversation.value.uuid) {
           console.log('Message received');
-          const isSentByViewer = messageData.user?._value?.id === currentUser.value?.id;
+          const isSentByViewer = messageData.user?.id === currentUser.id;
           messageData.isSentByViewer = isSentByViewer;
           if(isSentByViewer === false){
             activeConversation.value.dialogs.push(messageData);
@@ -376,7 +377,7 @@ onUnmounted(() => {
 });
 
 
-const updateUserData = (updatedUser) => {
+const updateUserData = (updatedUser: User) => {
   user.value = updatedUser; // 更新用戶資料
 };
 
@@ -394,11 +395,12 @@ const updateConversationPreview = (messageData: ChatDialog) => {
 
   if (targetIndex !== -1) {
     const old = conversations.value[targetIndex];
+    const timestamp = messageData.timestamp ? new Date(messageData.timestamp) : new Date();
 
     const updated = {
       ...old,
-      lastMessage: messageData.content || '[No text]',
-      timeSinceLastMessage: new Date(messageData.timestamp).toLocaleString('zh-TW', {
+      lastMessage: messageData.content ?? '[No text]',
+      timeSinceLastMessage: timestamp.toLocaleString('zh-TW', {
         year: 'numeric',
         month: '2-digit',
         day: '2-digit',
@@ -442,7 +444,7 @@ const isFileValid = ref<boolean>(false)
 const isChatLoading = ref<boolean>(false)
 
 //const currentUser: Sender = sender
-const currentUser: Sender = user
+const currentUser: Sender = user.value!
 
 // Active Chat Message
 const chatMessage = ref<ChatDialog>({
@@ -478,7 +480,7 @@ const sendMessage = (payload: Event) => {
             chatroom_id: activeConversation.value?.uuid,
             user: currentUser,
             timestamp:  getCurrentTimestamp(),
-            message_type: "text",
+            message_type: "text" as "text",
             isSentByViewer: true,
             content: message.value,
         }
@@ -616,7 +618,7 @@ const selectConversation = async (convo: Conversation) => {
                   
             return {
               ...msg,
-              isSentByViewer: msg.user?.id === currentUser.value?.id
+              isSentByViewer: msg.user?.id === currentUser.id
             };
           });
 

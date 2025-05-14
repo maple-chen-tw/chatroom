@@ -5,7 +5,7 @@ import type { PostCard } from "../types"
  */
 export interface BaseUser {
   /** Database ID */
-  id: string
+  id: number
 
   /** User's first name */
   // firstName: string
@@ -13,7 +13,7 @@ export interface BaseUser {
   /** User's last name */
   // lastName: string
   /** User's nick name */
-  nickname: string
+  nickname?: string
   
   /** User's user name */
   userName: string
@@ -22,7 +22,7 @@ export interface BaseUser {
   //gender: 'Female' | 'Male' | 'Other'
 
   /** URL of the user's profile picture */
-  profilePictureUrl: string
+  profilePictureUrl?: string
 
   /** User's email */
   email?: string
@@ -53,28 +53,28 @@ export interface BaseUser {
 export interface User extends BaseUser {
 
     /** Is user active? */
-    isActive?: boolean
+    //isActive?: boolean
   
     /** Whether the user's account is private or not */
-    isPrivate?: boolean
+    //isPrivate?: boolean
   
     /** Whether the user's account is verified or not */
-    isVerified?: boolean
+    //isVerified?: boolean
   
     /** Is user superuser? */
-    isSuperuser?: boolean
+    //isSuperuser?: boolean
   
     /** Last login date and time */
-    lastLogin?: string
+    //lastLogin?: string
   
     /** Joined date and time */
-    dateJoined: string
+    //dateJoined: string
   
     /** Entry last modification date and time */
-    lastModifiedAt?: string
+    //lastModifiedAt?: string
   
     /** Biography of the user */
-    biography?: string
+    //biography?: string
   
     /** Posts made by the user's */
     //mediaItems: PostCard[]

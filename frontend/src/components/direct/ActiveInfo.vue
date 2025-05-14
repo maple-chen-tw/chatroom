@@ -32,9 +32,9 @@
                                 v-if="selectedImage" 
                                 @click="cancelUpload"
                                 class="mt-1 ml-2 text-red-400 text-xs sm:text-sm hover:bg-slate-800 p-1 rounded"
-                            >
-    取消上傳
-</button>
+                              >
+                                取消上傳
+                            </button>
 
                     </div>
                     <div class="flex flex-col space-y-2">

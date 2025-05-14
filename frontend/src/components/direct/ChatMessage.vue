@@ -11,7 +11,7 @@
 		>
 		<img 
 			v-if="!dialog.isSentByViewer"
-			:src="dialog.user.profilePictureUrl || defaultAvatar"
+			:src="dialog.user?.profilePictureUrl ?? defaultAvatar"
 			class="cursor-pointer h-6 w-6 rounded-full shadow-lg self-end" />
 			<!-- TODO: Change to active user img based on user store -->
 
