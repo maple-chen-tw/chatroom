@@ -14,93 +14,21 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
+          path: '/',
+          redirect: '/accounts/login',
+          meta: {}
+    },
+    {
       path: '/',
       name: 'public',
       component: () => import('@/layouts/LayoutMain.vue'),
       children: [
-        {
-          path: '',
-          redirect: '/accounts/login'
-        },
-        //{
-        //  path: '/',
-        //  alias: '/home',
-        //  name: 'home',
-        //  component: () => import('@/views/Home.vue'),
-        //  meta: {}
-        //},
-        //{
-        //  path: '/explore',
-        //  name: 'explore',
-        //  component: () => import('@/views/Explore.vue'),
-        //  meta: {}
-        //},
-        //{
-        //  path: '/:username?',
-        //  name: 'profile', // TODO: Change to dynamic
-        //  component: () => import('@/views/Profile.vue'),
-        //  meta: {}
-        //},
-        //{
-        //  path: '/stories',
-        //  name: 'stories',
-        //  component: () => import('@/views/Story.vue'),
-        //  meta: {}
-        //},
         {
           path: '/direct',
           name: 'direct',
           component: () => import('@/views/Direct.vue'),
           meta: {}
         },
-        //{
-        //  path: '/reels',
-        //  name: 'reels',
-        //  component: () => import('@/views/Reels.vue'),
-        //  meta: {}
-        //},
-        //{
-        //  path: '/search',
-        //  name: 'search',
-        //  component: () => import('@/views/Search.vue'),
-        //  meta: {}
-        //},
-        //{
-        //  path: '/notifications',
-        //  name: 'notifications',
-        //  component: () => import('@/views/Notification.vue'),
-        //  meta: {}
-        //},
-        //{
-        //  path: '/settings',
-        //  name: 'settings',
-        //  component: () => import('@/views/Setting.vue'),
-        //  meta: {}
-        //},
-        //{
-        //  path: '/p/:id?',
-        //  name: 'post',
-        //  component: () => import('@/views/Post.vue'),
-        //  meta: {}
-        //},
-        //{
-        //  path: '/create',
-        //  name: 'create',
-        //  children: [
-        //    {
-        //      path: 'style',
-        //      name: 'style',
-        //      component: () => import('@/components/core/modals/PhotoModal.vue'),
-        //      meta: { title: 'Create Image' }
-        //    },
-        //    {
-        //      path: 'story',
-        //      name: 'story',
-        //      component: () => import('@/views/errors/NotFound.vue'),
-        //      meta: { title: 'Create Story' }
-        //    },
-        //  ],
-        //},
         {
           path: '/:pathMatch(.*)*',
           name: 'NotFound',

@@ -1,11 +1,14 @@
 # app/controllers/auth.py
 from fastapi import HTTPException, status, APIRouter
-from app.models import db
+from datetime import timedelta
 from app.models import dto
-from app.services.jwt_service import *
-from app.services import user_service
+from app.services import user_service, jwt_service
+from app.models.dto import Token
 from constants import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
+from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import Depends, HTTPException, status
 from utils import dependencies
+from typing import Annotated
 
 router = APIRouter(
     prefix="/auth",
@@ -57,14 +60,14 @@ async def login_for_access_token(
             headers={"WWW-Authenticate": "Bearer"},
             )
     
-    if not verify_password(form_data.password, user.hashed_password):
+    if not jwt_service.verify_password(form_data.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED, 
             detail="Incorrect password",
             headers={"WWW-Authenticate": "Bearer"},)
     
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    access_token = create_access_token(
+    access_token = jwt_service.create_access_token(
         data={"sub": user.username, "user_id": user.user_id}, expires_delta=access_token_expires
     )
     return Token(access_token=access_token, token_type="bearer")

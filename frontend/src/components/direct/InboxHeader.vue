@@ -36,9 +36,10 @@ import type {
 
 defineProps({
     currentUser: {
-        type: Object as () => Viewer,
-        required: true
-    }
+        type: Object as() => Viewer | null,
+        required: false,
+        default: null
+    },
 })
 
 const emit = defineEmits(["onNewMessage"])

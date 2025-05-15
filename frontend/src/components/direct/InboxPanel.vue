@@ -77,8 +77,9 @@ const props = defineProps({
         required: false
     },
     currentUser: {
-        type: Object as() => Viewer,
-        required: true
+        type: Object as() => Viewer | null,
+        required: false,
+        default: null
     },
     activePanel: {
         type: String,

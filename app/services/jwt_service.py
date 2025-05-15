@@ -1,15 +1,10 @@
 from datetime import datetime, timedelta, timezone
-from typing import Annotated
-
 import jwt
-from fastapi import Depends, FastAPI, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi.security import OAuth2PasswordBearer
 
 from passlib.context import CryptContext
-from app.services import user_service
-from app.models.dto import User, UserInDB, Token, TokenData
-from app.fake_db import fake_users_db
-from constants import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES
+from app.models.dto import UserInDB
+from constants import SECRET_KEY, ALGORITHM
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")

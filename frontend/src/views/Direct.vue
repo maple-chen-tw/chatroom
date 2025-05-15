@@ -81,6 +81,7 @@
 
 <script setup lang="ts">
 import {
+    computed,
     ref,
     watch
 } from 'vue'
@@ -354,7 +355,7 @@ onMounted(async () => {
         // Check if there's an active conversation and if it has a uuid
         if (activeConversation.value && activeConversation.value.uuid) {
           console.log('Message received');
-          const isSentByViewer = messageData.user?.id === currentUser.id;
+          const isSentByViewer = messageData.user?.id === user.value?.id;
           messageData.isSentByViewer = isSentByViewer;
           if(isSentByViewer === false){
             activeConversation.value.dialogs.push(messageData);
@@ -443,9 +444,6 @@ const isFileUploaded = ref<boolean>(false)
 const isFileValid = ref<boolean>(false)
 const isChatLoading = ref<boolean>(false)
 
-//const currentUser: Sender = sender
-const currentUser: Sender = user.value!
-
 // Active Chat Message
 const chatMessage = ref<ChatDialog>({
     message_id: undefined,
@@ -474,11 +472,14 @@ const sendMessage = (payload: Event) => {
     const message = payload?.target as HTMLInputElement
     // Prevent spacing values
     if (message.value.trim() != '') {
+        if (!user.value) {
+            console.error('User is null, cannot send message');
+            return;
+        }
         const messageData = {
-            // message_id: undefined,
 
             chatroom_id: activeConversation.value?.uuid,
-            user: currentUser,
+            user: user.value,
             timestamp:  getCurrentTimestamp(),
             message_type: "text" as "text",
             isSentByViewer: true,
@@ -571,14 +572,17 @@ const onFileUpload = async (event: Event) => {
         attachmentImage.value = event.target?.result as string
         isFileValid.value = true
         isFileUploaded.value = true
-
+        if (!user.value) {
+            alert("User is not logged in, please login first.");
+            return;
+        }
         const formData = new FormData()
         formData.append('file', file)
         try {
             const { data } = await axios.post('/upload/upload-message-file', formData)
 
             chatMessage.value = {
-                user: currentUser,
+                user: user.value,
                 message_type: data.message_type,
                 chatroom_id:activeConversation.value?.uuid,
                 isSentByViewer: true,
@@ -609,16 +613,16 @@ const selectConversation = async (convo: Conversation) => {
         // 從後端拉歷史訊息
         if (token) {
           const messages = await fetchMessages(activeConversation.value.uuid, token);
-          // console.log("Fetched messages:", messages);
-          // console.log("Current user:", currentUser.value);
+          //console.log("Fetched messages:", messages);
+          //console.log("Current user:", user);
 
           activeConversation.value.dialogs = messages.map((msg: ChatDialog) => {
-            // console.log("msg.user:", msg.user);
-            // console.log("Compare msg.user?.id vs currentUser.id:", msg.user?.id, currentUser.value?.id);
+            //console.log("msg.user:", msg.user);
+            //console.log("Compare msg.user?.id vs currentUser.id:", msg.user?.id, user.value?.id);
                   
             return {
               ...msg,
-              isSentByViewer: msg.user?.id === currentUser.id
+              isSentByViewer: msg.user?.id === user.value?.id
             };
           });
 
