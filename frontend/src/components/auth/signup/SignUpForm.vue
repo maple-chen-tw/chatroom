@@ -168,8 +168,8 @@ const signup = async () => {
 			password: signupForm.value.password
 		})
 
-		toast.success('註冊成功！即將跳轉...')
-		router.push({ name: 'direct' })
+		toast.success('註冊成功！即將跳轉至登入頁面...')
+		router.push({ name: 'login' })
 
 	} catch (error: any) {
 		const msg = error?.response?.data?.detail || '註冊失敗'

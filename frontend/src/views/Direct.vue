@@ -340,12 +340,12 @@ onMounted(async () => {
     } catch (error) {
         console.error("Error fetching user info:", error);
     }
-        socket.on('connect_error', (err) => {
+        socket.on('connect_error', (err: Error) => {
             console.error("❌ WebSocket connection error:", err);
         });
 
         // ✅ 重新連線成功
-        socket.on('reconnect', (attempt) => {
+        socket.on('reconnect', (attempt: number) => {
             console.log(`🔄 WebSocket reconnected (attempt ${attempt})`);
         });
 
