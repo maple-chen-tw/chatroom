@@ -9,6 +9,8 @@ from typing import Annotated
 from constants import SECRET_KEY, ALGORITHM
 from app.models.dto import TokenData
 
+from log_config import get_logger
+logger = get_logger(__name__)
 
 def get_user(token: Annotated[str, Depends(oauth2_scheme)])->db.User:
     credentials_exception = HTTPException(
@@ -18,18 +20,24 @@ def get_user(token: Annotated[str, Depends(oauth2_scheme)])->db.User:
     )
     
     try:
+        logger.debug(f"Attempting to decode token: {token}")
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        # print(f"Decoded Payload: {payload}")
         username: str = payload.get("sub")
         if username is None:
-            raise credentials_exception       
+            logger.warning("Token payload does not contain 'sub'")
+            raise credentials_exception
+        logger.debug(f"Token decoded successfully. Username: {username}")       
         token_data = TokenData(username=username)
+
         user = user_service.get_by_username(token_data.username)
         if user is None:
+            logger.warning(f"User not found in database: {username}")
             raise credentials_exception
         
-    except InvalidTokenError:
-        # print("Token invalid!")
+        logger.info(f"Authenticated user: {user.username} (id={user.user_id})")
+        
+    except InvalidTokenError as e:
+        logger.warning(f"Invalid token: {e}")
         raise credentials_exception
 
     return user

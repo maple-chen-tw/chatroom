@@ -2638,6 +2638,7 @@ pathval@^1.1.1:
     nprogress "^0.2.0"
     photo-flow "file:"
     pinia "^2.0.28"
+    socket.io-client "^4.8.1"
     swiper "^9.3.2"
     vue "^3.2.45"
     vue-router "^4.1.6"

@@ -132,19 +132,22 @@
 
 ```
 .
-├── main.py                  # 專案入口，啟動 FastAPI 應用
-├── app/                     # 核心應用邏輯（後端架構）
-│   ├── controllers/         # API 控制器，處理路由請求邏輯
-│   ├── db/                  # 資料庫連線與初始化
-│   │   └── context.py       # DB 連線設定與初始化函式
-│   ├── models/              # 資料結構與定義
-│   │   ├── db.py            # SQLAlchemy 模型
-│   │   └── dto.py           # Pydantic 資料傳輸物件 (DTO)
-│   ├── repos/               # 資料操作層（Repository Pattern）
-│   ├── services/            # 商業邏輯與處理（Service Layer）
-│   └── sockets/             # Socket.IO 實作與事件處理
-├── static/                  # 上傳檔案與靜態資源（如頭像、媒體）
-├── utils/                   # 共用工具函式
+├── backend
+|   ├── main.py                  # 專案入口，啟動 FastAPI 應用
+|   ├── app/                     # 核心應用邏輯（後端架構）
+|   │   ├── controllers/         # API 控制器，處理路由請求邏輯
+|   │   ├── db/                  # 資料庫連線與初始化
+|   │   │   └── context.py       # DB 連線設定與初始化函式
+|   │   ├── models/              # 資料結構與定義
+|   │   │   ├── db.py            # SQLAlchemy 模型
+|   │   │   └── dto.py           # Pydantic 資料傳輸物件 (DTO)
+|   │   ├── repos/               # 資料操作層（Repository Pattern）
+|   │   ├── services/            # 商業邏輯與處理（Service Layer）
+|   │   └── sockets/             # Socket.IO 實作與事件處理
+|   ├── static/                  # 上傳檔案與靜態資源（如頭像、媒體）
+|   ├── utils/                   # 共用工具函式
+|   ├── constants.py             # 放置全域常數，便於統一管理與重複使用
+|   └── log_config.py            # 設定 logging 格式與等級，統一控制專案的日誌輸出行為
 └── frontend/                # 前端 Vue.js 專案
 ```
 📌 採用 MVC + 分層架構：
