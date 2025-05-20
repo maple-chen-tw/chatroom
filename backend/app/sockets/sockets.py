@@ -1,11 +1,11 @@
 import socketio
 from log_config import get_logger
 logger = get_logger(__name__)
+from constants import ALLOWED_ORIGINS
 
 sio = socketio.AsyncServer(
     async_mode="asgi",
-    cors_allowed_origins=["http://localhost:5173"],
-    # cors_allowed_origins=["*"],
+    cors_allowed_origins=ALLOWED_ORIGINS,
     transports=["polling", "websocket"],
 )
 
