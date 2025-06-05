@@ -1,6 +1,6 @@
 <template>
     <div 
-        :class="class"
+        :class="$props.class"
         class="flex flex-inital flex-row text-center space-x-1">
         <img 
             :src="profileImage" 

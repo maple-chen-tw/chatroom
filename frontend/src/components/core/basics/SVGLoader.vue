@@ -1,5 +1,5 @@
 <template>
-    <span :class="class">
+    <span :class="props.class">
         <i v-html="svg"/>
     </span>
 </template>
