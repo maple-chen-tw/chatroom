@@ -147,8 +147,11 @@
 |   ├── static/                  # 上傳檔案與靜態資源（如頭像、媒體）
 |   ├── utils/                   # 共用工具函式
 |   ├── constants.py             # 放置全域常數，便於統一管理與重複使用
-|   └── log_config.py            # 設定 logging 格式與等級，統一控制專案的日誌輸出行為
-└── frontend/                # 前端 Vue.js 專案
+|   ├── log_config.py            # 設定 logging 格式與等級，統一控制專案的日誌輸出行為
+|   ├── Dockerfile               
+|   └── init_db.py            
+├── frontend/                    # 前端 Vue.js 專案
+└── docker-compose.yml
 ```
 📌 採用 MVC + 分層架構：
 
