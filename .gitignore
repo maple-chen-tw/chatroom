@@ -13,3 +13,6 @@ backend/.env.development
 backend/.env.production
 backend/chatroom-docker-mysql.pem
 backend/Dockerfile
+frontend/.env.production
+chatroom_backend.zip
+docker-compose.yml
