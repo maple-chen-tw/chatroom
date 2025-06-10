@@ -17,7 +17,7 @@
 				<div class="self-center mb-2">
 				<img 
 					class="w-35 h-25"
-					src="@/assets/images/404chat.png" />
+					src="@/assets/images/chatify_b.png" />
 				</div>
 
 				<!-- Input: Email -->
@@ -158,8 +158,8 @@ const validation = computed(() => ({
             required
         ),
         minLength: helpers.withMessage(
-            'Min length is 4 characters',
-            minLength(4)
+            'Min length is 8 characters',
+            minLength(8)
         )
     }
 }))

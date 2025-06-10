@@ -6,7 +6,7 @@
         <div class="xl:block flex font-sans text-md font-normal text-white">
           <img 
               class="w-35 h-10"
-              src="@/assets/images/404chat_white.png" />
+              src="@/assets/images/chatify_w.png" />
         </div>
 
         <div class="xl:block flex justify-end font-sans text-md font-normal text-white">

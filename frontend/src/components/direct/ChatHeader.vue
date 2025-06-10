@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import defaultAvatar from '@/assets/images/404ghost.png';
+import defaultAvatar from '@/assets/images/chatify_user.png';
 import {
     SVGLoader
 } from '@/components'

@@ -4,7 +4,7 @@
         lg:basis-9/12 w-full md:h-full h-screen hidden text-center">
         <div class="flex flex-col space-y-1 text-center">
                 <img 
-                src="@/assets/images/404chat_white.png" style="width:50%;display:block;margin:auto;"/>
+                src="@/assets/images/chatify_w.png" style="width:50%;display:block;margin:auto;"/>
 
             <div class="text-white md:text-xl text-xs pt-3 ">
                 朋友 404 Not Found？

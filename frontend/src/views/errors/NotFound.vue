@@ -10,7 +10,7 @@
             <p>
                 The link you followed may be broken, or the page may have been removed. 
                 <router-link to="/">
-                    Go back to 404Chat.
+                    Go back to Chatify.
                 </router-link>
             </p>
             
