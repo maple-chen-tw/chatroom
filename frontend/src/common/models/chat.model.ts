@@ -36,7 +36,7 @@ export interface ChatDialog {
     message_id?: number
 
     /** The ID of the chatroom this message belongs to */
-    chatroom_id?: string  // UUID string of the chatroom (BINARY(16) stored in backend)
+    chatroom_id?: string  // UUID string of the chatroom
 
     /** A simple instance of the user */
     user?: Sender | Viewer

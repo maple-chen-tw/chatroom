@@ -3,7 +3,6 @@ from enum import Enum
 from pydantic import BaseModel
 from datetime import datetime
 from pydantic import Field
-import uuid
 from typing import Optional
 
 class Token(BaseModel):
@@ -57,14 +56,9 @@ class Friend(BaseModel):
     avatar_url: str | None = None
 
 class Chatroom(BaseModel):
-    chatroom_id: bytes
+    chatroom_id: str
     chatroom_name: str | None = None
     friend_name: str
-
-    @property
-    def chatroom_id_str(self) -> str:
-        """Converts binary chatroom_id to a UUID string."""
-        return uuid.UUID(bytes=self.chatroom_id).hex
 
     class Config:
         orm_mode = True
@@ -93,27 +87,17 @@ class Message(BaseModel):
     media_url:  str | None = None
     read_status: ReadStatus
     timestamp:  datetime | None = None
-    @property
-    def chatroom_id_str(self) -> str:
-        """Converts binary chatroom_id to a UUID string."""
-        return uuid.UUID(bytes=self.chatroom_id).hex
-
     class Config:
         orm_mode = True
 
 class ChatroomWithFriend(BaseModel):
-    chatroom_id: bytes
+    chatroom_id: str
     chatroom_name: str | None = None
     user_id: int
     username: str 
     nickname: str| None = None
     avatar_url: str | None = None
     status: str| None = None
-
-    @property
-    def chatroom_id_str(self) -> str:
-        """Converts binary chatroom_id to a UUID string."""
-        return uuid.UUID(bytes=self.chatroom_id).hex
 
     class Config:
         orm_mode = True

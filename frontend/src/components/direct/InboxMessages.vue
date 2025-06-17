@@ -21,7 +21,7 @@
 				</span>
 
 				<div class="flex flex-row space-x-1">
-					<span class="font-sans text-xs font-semibold text-gray-400 truncate max-w-xs">
+					<span class="font-sans text-xs font-semibold text-gray-400 truncate max-h-xs max-w-xs max-w-full last-message">
 						{{ convo.lastMessage }}
 					</span>
 
@@ -90,5 +90,17 @@ const formatedDate = (date: string) => {
 
 .max-w-xs {
     max-width: 200px;
+}
+
+.max-h-xs {
+    max-height: 50px;
+}
+
+.last-message {
+    white-space: normal;     
+    word-wrap: break-word;   
+    word-break: break-word;  
+    overflow: hidden;        
+    text-overflow: ellipsis; 
 }
 </style>

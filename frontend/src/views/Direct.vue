@@ -3,7 +3,7 @@
         <div class="md:flex md:flex-row md:p-0 md:place-self-center md:max-w-4xl m-auto items-center
             sm:p-2 border-[#363636] border-2 w-full h-4/5">
             <!-- Navigation and Messages overview -->
-            <div class="flex flex-col h-full w-2/5">
+            <div class="flex flex-col h-full w-2/5 overflow-hidden">
                 <!-- activePanel -->
                 <InboxPanel
                   v-if="activePanel === 'user'"

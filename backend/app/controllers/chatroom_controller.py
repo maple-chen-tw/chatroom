@@ -5,7 +5,7 @@ from app.models import db
 from app.models import dto
 from app.services import friend_service, chatroom_service, user_service
 from utils import dependencies
-from uuid import UUID
+
 router = APIRouter(
     prefix="/chatrooms",
     tags=["Chatrooms"],
@@ -17,21 +17,21 @@ def get_chatrooms(user: dependencies.user_dependency):
     chatrooms = chatroom_service.get_chatrooms(user.user_id)
     return chatrooms
 
+# Add a new chatroom
 @router.post("/", response_model=dto.Chatroom)
-def add_chatroom(chatroom: dto.CreateChatroom ,user: dependencies.user_dependency) -> db.Chatroom:
+def add_chatroom(chatroom: dto.CreateChatroom, user: dependencies.user_dependency) -> db.Chatroom:
     try:
         members_id = chatroom.members_id
         chatroom_name = chatroom.chatroom_name
 
         if not isinstance(members_id, list):
             raise HTTPException(status_code=400, detail="members_id must be a list")
-
         if not all(isinstance(mid, int) for mid in members_id):
             raise HTTPException(status_code=400, detail="Each member_id must be an integer")
 
         if user.user_id not in members_id:
             members_id.append(user.user_id)
-            
+
         if len(members_id) < 2:
             raise HTTPException(status_code=400, detail="A chatroom must have at least 2 members")
 
@@ -42,7 +42,7 @@ def add_chatroom(chatroom: dto.CreateChatroom ,user: dependencies.user_dependenc
             friend_name = friend.username
         else:
             friend_name = None
-            
+
         return dto.Chatroom(
             chatroom_id=chatroom_id,
             chatroom_name=chatroom_name,
@@ -52,27 +52,19 @@ def add_chatroom(chatroom: dto.CreateChatroom ,user: dependencies.user_dependenc
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
 # Retrieves the details of the chatroom
-@router.get("/{chatroom_id}",response_model=dto.Chatroom)
+@router.get("/{chatroom_id}", response_model=dto.Chatroom)
 def get_chatroom(chatroom_id: str, user: dependencies.user_dependency) -> db.Chatroom:
-    chatroom_uuid = UUID(chatroom_id)
-    chatroom_bytes = chatroom_uuid.bytes
-    chatroom = chatroom_service.get_chatroom(chatroom_bytes)
+    chatroom = chatroom_service.get_chatroom(chatroom_id)
     return chatroom
 
-# @router.post("/{chatroom_id}", response_model=None)
-# def update_chatroom(chatroom_id: bytes, user: dependencies.user_dependency) -> None:
-#     return
-
-@router.get("/{chatroom_id}/messages", response_model = list[dto.Message])
+# Retrieves messages of the chatroom
+@router.get("/{chatroom_id}/messages", response_model=list[dto.Message])
 def get_messages(user: dependencies.user_dependency, chatroom_id: str, limit: int, before: datetime | None = None):
-    chatroom_uuid = UUID(chatroom_id)
-    chatroom_bytes = chatroom_uuid.bytes
-    messages = chatroom_service.get_messages(chatroom_bytes, limit, before)
+    messages = chatroom_service.get_messages(chatroom_id, limit, before)
     return messages
 
+# Sends a new message
 @router.post("/{chatroom_id}/message")
-def add_message(chatroom_id: str, message: dto.Message , user: dependencies.user_dependency)-> None:
-    chatroom_uuid = UUID(chatroom_id)
-    chatroom_bytes = chatroom_uuid.bytes
-    message_id = chatroom_service.add_message(chatroom_id=chatroom_bytes, message=message, user_id = user.user_id)
+def add_message(chatroom_id: str, message: dto.Message, user: dependencies.user_dependency) -> None:
+    message_id = chatroom_service.add_message(chatroom_id=chatroom_id, message=message, user_id=user.user_id)
     return

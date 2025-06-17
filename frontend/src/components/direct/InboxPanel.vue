@@ -7,7 +7,7 @@
 			:current-user="currentUser" />
 
 		<!-- Inbox Rendering -->
-		<div class="overflow-auto lg:max-h-[850px]">
+		<div class="lg:max-h-[850px]">
 
             <div v-if="activePanel === 'plus'">
 			<!-- plus -->
