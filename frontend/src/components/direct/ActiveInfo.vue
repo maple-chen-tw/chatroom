@@ -9,33 +9,49 @@
             <div 
 	    		class="grid grid-cols-[auto,1fr] p-3 space-x-3 w-full mr-4">
                 <div class="flex items-center space-x-3">
-                    <div>
-	            	    <img 
-	            	      	:src="previewImage || currentUser?.profilePictureUrl || defaultAvatar"
-	            	      	class="cursor-pointer rounded-full shadow-lg max-w-[150px] h-auto"
-                            alt="頭像預覽"/>
-                              <input 
-                                type="file" 
-                                accept="image/*"
-                                @change="handleImageUpload"
-                                class="mt-2 text-white text-xs"
-                            />
-
-                            <button 
-                                v-if="selectedImage" 
-                                @click="uploadAvatarToServer"
-                                class="mt-1 text-white text-xs sm:text-sm hover:bg-slate-700 p-1 rounded"
-                            >
-                                上傳頭像
-                            </button>
-                            <button 
-                                v-if="selectedImage" 
-                                @click="cancelUpload"
-                                class="mt-1 ml-2 text-red-400 text-xs sm:text-sm hover:bg-slate-800 p-1 rounded"
-                              >
-                                取消上傳
-                            </button>
-
+                    <!-- 頭像區塊 -->
+                    <div class="flex flex-col items-center space-y-2 w-[150px]">
+                      <div class="relative w-[150px] h-[150px]">
+                        <img 
+                          :src="previewImage || currentUser?.profilePictureUrl || defaultAvatar"
+                          class="cursor-pointer rounded-full shadow-lg w-full h-full object-cover"
+                          alt="頭像預覽"
+                        />
+                      
+                        <!-- 小圓形按鈕（右下角） -->
+                        <button
+                          @click="triggerFileInput"
+                          class="absolute bottom-1 right-1 bg-slate-700 hover:bg-slate-600 text-white rounded-full p-1 shadow-md"
+                          title="上傳新頭像"
+                        >
+                          <i class="fas fa-camera text-xs"></i>
+                        </button>
+                      
+                        <!-- 隱藏的 input -->
+                        <input 
+                          type="file" 
+                          ref="fileInput"
+                          accept="image/*"
+                          @change="handleImageUpload"
+                          class="hidden"
+                        />
+                      </div>
+                    
+                      <!-- 按鈕在下方 -->
+                      <div v-if="selectedImage" class="flex justify-center space-x-2">
+                        <button 
+                          @click="uploadAvatarToServer"
+                          class="text-white text-xs sm:text-sm hover:bg-slate-700 p-1 rounded"
+                        >
+                          上傳頭像
+                        </button>
+                        <button 
+                          @click="cancelUpload"
+                          class="text-red-400 text-xs sm:text-sm hover:bg-slate-800 p-1 rounded"
+                        >
+                          取消上傳
+                        </button>
+                      </div>
                     </div>
                     <div class="flex flex-col space-y-2">
                         <!-- Username with Edit icon -->
@@ -122,6 +138,7 @@ const props = defineProps({
         required: true
     }
 })
+
 const isEditingStatus = ref(false);
 const editedStatus = ref("");
 const emit = defineEmits(["updateUser"]);
@@ -255,6 +272,9 @@ const uploadAvatarToServer = async () => {
 const cancelUpload = () => {
     selectedImage.value = null;
     previewImage.value = null;
+    if (fileInput.value) {
+    fileInput.value.value = '';
+  }
 };
 
 // Services
@@ -264,4 +284,11 @@ const router = useRouter()
 const onPageBack = () => {
     router.back()
 }
+
+const fileInput = ref<HTMLInputElement | null>(null);
+
+const triggerFileInput = () => {
+  fileInput.value?.click();
+};
+
 </script>

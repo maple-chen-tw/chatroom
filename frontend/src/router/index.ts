@@ -103,7 +103,7 @@ router.beforeEach(async (to, from, next) => {
 router.afterEach((to, from, failure) => {
   if (to.meta.title && failure?.from.path !== ROOT_ROUTE) {
     // Only update page title if no failure
-    document.title = `Chat - ${ to.meta.title }`
+    document.title = `Chatify`
   }
 
   // Complete the animation of the route progress bar.
