@@ -1,5 +1,6 @@
 # Chatroom聊天室系統
 本專案為一個模擬 LINE/IG 的一對一即時通訊聊天室系統，旨在練習後端實作即時通訊、使用者驗證與資料關聯設計。由本人獨立開發，從架構設計到資料庫、API、Socket.IO 全部親自設計與串接。
+
 此專案具備 JWT 登入驗證、即時通訊（Socket.IO）、好友管理與檔案上傳功能，採用 FastAPI + MySQL + Vue 架構開發。
 
 ## 🧰 使用技術
@@ -98,14 +99,14 @@
 ### 📌 chatrooms – 聊天室資料表
 | 欄位名稱 | 類型 | 說明 |
 |----------|------|------|
-| chatroom_id | BINARY(16) (PK) | 聊天室唯一識別碼（UUID 格式） |
+| chatroom_id | CHAR(36) (PK) | 聊天室唯一識別碼（UUID 格式） |
 | chatroom_name | VARCHAR(32) | 聊天室名稱 |
 | created_at | TIMESTAMP | 建立時間 |
 
 ### 📌 participants – 聊天室參與者表
 | 欄位名稱 | 類型 | 說明 |
 |----------|------|------|
-| chatroom_id | BINARY(16) (PK, FK) | 對應聊天室 |
+| chatroom_id | CHAR(36) (PK, FK) | 對應聊天室 |
 | user_id | INT (PK, FK) | 參與的使用者 ID |
 
 >📎 用來建立使用者與聊天室的多對多關聯。
@@ -114,7 +115,7 @@
 | 欄位名稱 | 類型 | 說明 |
 |----------|------|------|
 | message_id | INT (PK) | 訊息唯一 ID，自動遞增 |
-| chatroom_id | BINARY(16) (FK) | 所屬聊天室 |
+| chatroom_id | CHAR(36) (FK) | 所屬聊天室 |
 | sender_id | INT (FK) | 發送者的使用者 ID |
 | content | TEXT | 訊息內容（文字） |
 | message_type | ENUM | 訊息類型（`text` / `image` / `audio` / `file` / `video`） |
@@ -124,7 +125,7 @@
 ---
 
 ### 💡 設計說明
->1. 使用 UUID (BINARY 16) 為聊天室主鍵。
+>1. 使用 UUID (CHAR 36) 為聊天室主鍵。
 >2. 所有關聯表皆使用 ON DELETE CASCADE 確保資料完整性。
 >3. 好友關係用 status 控制流程，支援好友請求機制。
 
