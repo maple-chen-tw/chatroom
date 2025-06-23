@@ -1,6 +1,10 @@
 # Chatroom聊天室系統
 一個模擬 LINE / IG 私訊功能的聊天室系統，具備 JWT 登入驗證、即時通訊（Socket.IO）、好友管理與檔案上傳功能，採用 FastAPI + MySQL + Vue 架構開發。
 
+## Demo
+[登入、好友管理、個人資料](https://youtu.be/p1AkPASlUCA)
+[即時通訊、圖片上傳](https://youtu.be/0rHbUGuPYDU)
+
 ## 🧰 使用技術
 
 | 分類 | 技術 | 說明 |
