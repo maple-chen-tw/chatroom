@@ -1,7 +1,9 @@
 # Chatroom聊天室系統
-本專案為一個模擬 LINE/IG 的一對一即時通訊聊天室系統，旨在練習後端實作即時通訊、使用者驗證與資料關聯設計。由本人獨立開發，從架構設計到資料庫、API、Socket.IO 全部親自設計與串接。
+一個模擬 LINE / IG 私訊功能的聊天室系統，具備 JWT 登入驗證、即時通訊（Socket.IO）、好友管理與檔案上傳功能，採用 FastAPI + MySQL + Vue 架構開發。
 
-此專案具備 JWT 登入驗證、即時通訊（Socket.IO）、好友管理與檔案上傳功能，採用 FastAPI + MySQL + Vue 架構開發。
+## Demo
+1. [登入、好友管理、個人資料](https://youtu.be/p1AkPASlUCA)
+2. [即時通訊、圖片上傳](https://youtu.be/0rHbUGuPYDU)
 
 ## 🧰 使用技術
 
@@ -99,14 +101,14 @@
 ### 📌 chatrooms – 聊天室資料表
 | 欄位名稱 | 類型 | 說明 |
 |----------|------|------|
-| chatroom_id | CHAR(36) (PK) | 聊天室唯一識別碼（UUID 格式） |
+| chatroom_id | BINARY(16) (PK) | 聊天室唯一識別碼（UUID 格式） |
 | chatroom_name | VARCHAR(32) | 聊天室名稱 |
 | created_at | TIMESTAMP | 建立時間 |
 
 ### 📌 participants – 聊天室參與者表
 | 欄位名稱 | 類型 | 說明 |
 |----------|------|------|
-| chatroom_id | CHAR(36) (PK, FK) | 對應聊天室 |
+| chatroom_id | BINARY(16) (PK, FK) | 對應聊天室 |
 | user_id | INT (PK, FK) | 參與的使用者 ID |
 
 >📎 用來建立使用者與聊天室的多對多關聯。
@@ -115,7 +117,7 @@
 | 欄位名稱 | 類型 | 說明 |
 |----------|------|------|
 | message_id | INT (PK) | 訊息唯一 ID，自動遞增 |
-| chatroom_id | CHAR(36) (FK) | 所屬聊天室 |
+| chatroom_id | BINARY(16) (FK) | 所屬聊天室 |
 | sender_id | INT (FK) | 發送者的使用者 ID |
 | content | TEXT | 訊息內容（文字） |
 | message_type | ENUM | 訊息類型（`text` / `image` / `audio` / `file` / `video`） |
@@ -125,7 +127,7 @@
 ---
 
 ### 💡 設計說明
->1. 使用 UUID (CHAR 36) 為聊天室主鍵。
+>1. 使用 UUID (BINARY 16) 為聊天室主鍵。
 >2. 所有關聯表皆使用 ON DELETE CASCADE 確保資料完整性。
 >3. 好友關係用 status 控制流程，支援好友請求機制。
 
@@ -149,10 +151,11 @@
 |   ├── static/                  # 上傳檔案與靜態資源（如頭像、媒體）
 |   ├── utils/                   # 共用工具函式
 |   ├── constants.py             # 放置全域常數，便於統一管理與重複使用
-|   ├── log_config.py            # 設定 logging 格式與等級，統一控制專案的日誌輸出行為               
+|   ├── log_config.py            # 設定 logging 格式與等級，統一控制專案的日誌輸出行為
+|   ├── Dockerfile               
 |   └── init_db.py            
-└── frontend/                    # 前端 Vue.js 專案
-
+├── frontend/                    # 前端 Vue.js 專案
+└── docker-compose.yml
 ```
 📌 採用 MVC + 分層架構：
 
@@ -171,36 +174,15 @@
 
 - 自行設計資料庫架構與資料關聯（使用 MySQL）
 - 後端 RESTful API 設計與實作
-- 在登入驗證部分，我採用 JWT 來實作登入驗證與身分驗證機制，確保使用者只有在驗證成功後才能進入聊天室頁面。
+- 使用 JWT 實作登入驗證與身分驗證機制
 - 整合 Socket.IO 處理前後端即時訊息傳遞、連線管理與錯誤處理
 
 
-## 📌 專案部屬架構
+## 🔮 未來規劃
 
-此專案為方便展示與模擬實際環境，採用 AWS 雲端服務進行部署，整體架構如下：
-
-### 🖼️ 前端部署
-- 使用 Vue.js 開發，部署於 AWS S3，作為靜態網站提供服務。
-
-### 🧩 後端與資料庫
-- 於 AWS EC2 主機中執行兩個 container，分別為：
-  - `FastAPI` 後端應用，提供 RESTful API 與 `socket.io` 即時通訊功能
-  - `MySQL` 資料庫
-- 透過自建的 `Dockerfile` 與 `docker-compose.yml` 完成服務容器化與編排部署。
-
-### 📁 檔案儲存
-- 所有圖片與檔案皆上傳至 S3 儲存，透過自動產生的亂數檔名避免檔案重複與資訊洩漏。
-- 為降低風險，S3 不對外開放瀏覽索引，並僅透過應用程式控管檔案存取。
-
-📌 **備註：** 本專案為面試展示用途，為避免資源浪費與潛在安全風險，目前不開放對外網址，僅提供架構圖與 Demo 操作影片。
-
----
-
-## 🔮 未來優化規劃
-
-- 整合 Nginx 作為反向代理伺服器，統一處理 API 請求與靜態資源路由
-- 部署 HTTPS（SSL）以提升資料傳輸安全性
-- 考慮導入 CI/CD 工具（如 GitHub Actions）以自動化部署流程
+- 部署至 AWS（使用 EC2、RDS、S3 儲存上傳檔案）
+- 使用 Docker 建立開發與生產環境一致性
+- 使用 Nginx 作為反向代理伺服器
 
 
 ## 🧑‍💻 開發者資訊
@@ -210,4 +192,3 @@
 - 後端架構設計與實作（FastAPI + Socket.IO）
 - 資料庫設計與測試（MySQL）
 - 前端架構調整與串接（基於公開模板進行客製化）
-- AWS雲端服務部署
